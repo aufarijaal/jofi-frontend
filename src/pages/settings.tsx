@@ -23,7 +23,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 }
 
-const SettingsPage = ({ info }) => {
+const SettingsPage = ({ info }: any) => {
   const router = useRouter()
 
   function refresh() {
