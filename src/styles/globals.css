@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .skill-search-result__item {
+    @apply btn btn-xs;
+  }
+}
