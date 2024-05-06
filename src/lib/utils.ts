@@ -39,11 +39,11 @@ export function formatLastActive(lastActiveString: string) {
 }
 
 export function generateCompanyLogoUrl(logo: string) {
-  return `${process.env.NEXT_PUBLIC_SERVER_HOST}/company-logos/${logo}`
+return `${process.env.NEXT_PUBLIC_COMPANY_LOGOS_URL}${logo}`
 }
 
 export function generatePhotoProfileUrl(photo: string) {
-  return `${process.env.NEXT_PUBLIC_SERVER_HOST}/photo-profiles/${photo}`
+  return `${process.env.NEXT_PUBLIC_PHOTO_PROFILES_URL}${photo}`
 }
 
 export function showModal(elementId: string) {
