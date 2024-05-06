@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import { getCookie } from 'cookies-next'
 
-const baseURL = 'http://localhost:3001'
+const baseURL = process.env.NEXT_PUBLIC_SERVER_HOST
 
 axios.defaults.withCredentials = true
 axios.defaults.baseURL = baseURL

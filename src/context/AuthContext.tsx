@@ -88,7 +88,8 @@ export const AuthContextProvider = ({
         setUser(undefined)
       }
     } catch (error) {
-      console.log(error)
+      // console.log(error)
+      throw error;
     } finally {
       setLoading(false)
     }
