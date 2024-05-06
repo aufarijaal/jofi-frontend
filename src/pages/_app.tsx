@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils'
 import { AuthContextProvider } from '@/context/AuthContext'
 import { useEffect } from 'react'
 import { useTheme } from 'next-themes'
+import NextTopLoader from 'nextjs-toploader'
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -67,6 +68,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           themes={['corporate', 'business']}
           disableTransitionOnChange
         >
+          <NextTopLoader />
           {router.pathname === '/404' ? (
             <Component {...pageProps} />
           ) : (
