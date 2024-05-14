@@ -4,16 +4,15 @@ import EmployerJobCard from '@/components/job-card/employer-job-card'
 import useDialog from '@/hooks/useDialog'
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs'
 import { AxiosError } from 'axios'
-import Head from 'next/head'
-import React, { useEffect, useState } from 'react'
-import { toast } from 'react-toastify'
+import { useEffect, useState } from 'react'
 import axios from '@/lib/axios'
-import { FilterParams, JobPostForEmployer } from '@/types'
-import { JsonView, defaultStyles } from 'react-json-view-lite'
+import { JobPostForEmployer } from '@/types'
 import { useDebounce } from 'use-debounce'
 import convertRupiah from '@/lib/convertRupiah'
 import dayjs from 'dayjs'
 import FormEditJobPost from '@/components/forms/form-edit-job-post'
+import useAlert from '@/hooks/useAlert'
+import { toast } from 'sonner'
 
 function EmployerDashboardJobPosts() {
   const AddJobPostDialog = useDialog()
@@ -32,6 +31,7 @@ function EmployerDashboardJobPosts() {
   const [dataPerPage, setDataPerPage] = useState(10)
   const [sortBy, setSortBy] = useState('newest')
   const [loading, setLoading] = useState(true)
+  const Alert = useAlert()
 
   async function getJobPosts() {
     try {
@@ -62,6 +62,7 @@ function EmployerDashboardJobPosts() {
   async function deleteJobPost(id: number) {
     try {
       if (confirm(`Are you sure want to delete this job post?`)) {
+        setLoading(true)
         await axios.delete(`/jobs/${id}`)
 
         page === 1 ? getJobPosts() : setPage(1)
@@ -71,7 +72,12 @@ function EmployerDashboardJobPosts() {
 
       if (error instanceof AxiosError) {
         console.log(error.response?.data.message)
+        toast.error('Failed to delete job post', {
+          description: error.response?.data.message
+        })
       }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -129,7 +135,9 @@ function EmployerDashboardJobPosts() {
         {JSON.stringify(pagination)}
         {`count is ${count}`} */}
 
-        <div className="toolbar flex flex-col gap-6">
+        <Alert.Alert dismissable />
+
+        <div className="toolbar flex flex-col gap-6 mt-6">
           <div className="toolbar__line-2 flex items-center gap-4">
             <form
               id="employer-job-search"
@@ -154,7 +162,6 @@ function EmployerDashboardJobPosts() {
           <div className="toolbar__line-1 flex items-center gap-4">
             <select
               className="select select-bordered select-sm"
-              defaultValue="newest"
               onChange={(e) => setSortBy(e.currentTarget.value)}
               value={sortBy}
             >
@@ -170,7 +177,6 @@ function EmployerDashboardJobPosts() {
             <div className="flex items-center gap-2 flex-grow">
               <select
                 className="select select-bordered select-sm"
-                defaultValue="10"
                 value={dataPerPage}
                 onChange={(e) =>
                   setDataPerPage(parseInt(e.currentTarget.value))
@@ -215,10 +221,11 @@ function EmployerDashboardJobPosts() {
                     EditJobPostDialog.show()
                   }}
                   onDeleteBtnClick={(id) => deleteJobPost(id)}
+                  key={i}
                 />
               ))
             : Array.from({ length: 10 }, (v, i) => (
-                <div className="skeleton w-full h-[277px]"></div>
+                <div className="skeleton w-full h-[277px]" key={i}></div>
               ))}
         </div>
 

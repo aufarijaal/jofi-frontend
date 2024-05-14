@@ -9,6 +9,7 @@ import { z } from 'zod'
 import axios from '@/lib/axios'
 import { JsonView } from 'react-json-view-lite'
 import { Skill } from '@/types'
+import { toast } from 'sonner'
 
 interface UserSkill {
   id: number
@@ -27,35 +28,51 @@ const FormSkills: React.FC<{
   const btnAddRef = useRef<HTMLButtonElement>(null)
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const [skillSearchResult, setSkillSearchResult] = useState<Skill[]>(() => [])
+  const [isLoading, setIsLoading] = useState(false)
 
   async function addItem(item: Skill) {
     try {
+      setIsLoading(true)
       const result = await axios.post(`/user-skills`, item)
 
       // fill with the updated data
       setUserSkills(result.data.data)
-      setValue("")
+      setValue('')
       setSkillSearchResult([])
+      toast.success('New skill added')
     } catch (error) {
       console.error(error)
+
+      toast.error("Failed to add new skill")
+    } finally {
+      setIsLoading(false)
     }
   }
 
   async function removeItem(userSkillId: number) {
     try {
+      setIsLoading(true)
       const result = await axios.delete(`/user-skills/${userSkillId}`)
 
       // fill with the updated data
       setUserSkills(result.data.data)
-      setValue("")
+      setValue('')
       setSkillSearchResult([])
+
+      toast.success("Skill removed")
     } catch (error) {
       console.error(error)
+    } finally {
+      setIsLoading(false)
+
+      toast.error('Failed to remove skill')
     }
   }
 
   async function getSkill() {
     try {
+      setSkillSearchResult(() => [])
+      setIsLoading(true)
       if (debouncedValue) {
         const result = await axios.get<{ data: Skill[] }>(`/skills/search`, {
           params: {
@@ -70,6 +87,8 @@ const FormSkills: React.FC<{
       console.error(error)
 
       setSkillSearchResult(() => [])
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -96,6 +115,7 @@ const FormSkills: React.FC<{
                 </div>
                 <button
                   className="btn btn-xs btn-error"
+                  disabled={isLoading}
                   onClick={() => removeItem(userSkill.id)}
                 >
                   <Icon icon="mdi:close" />
@@ -141,23 +161,25 @@ const FormSkills: React.FC<{
                           .toLowerCase()
                           .includes(debouncedValue.trim().toLowerCase())
                       : false
-                  ) ? (
-                    <button
-                      className="skill-search-result__item"
-                      key={0}
-                      onClick={() => {
-                        addItem({
-                          id: 0,
-                          name: debouncedValue,
-                          slug: ""
-                        })
-                      }}
-                      type="button"
-                    >
-                      {debouncedValue}
-                      <sup className="text-accent text-[8px]">NEW</sup>
-                    </button>
-                  ) : null}
+                  )
+                    ? !isLoading && (
+                        <button
+                          className="skill-search-result__item"
+                          key={0}
+                          onClick={() => {
+                            addItem({
+                              id: 0,
+                              name: debouncedValue,
+                              slug: '',
+                            })
+                          }}
+                          type="button"
+                        >
+                          {debouncedValue}
+                          <sup className="text-accent text-[8px]">NEW</sup>
+                        </button>
+                      )
+                    : null}
                   {skillSearchResult && skillSearchResult.length > 0 ? (
                     skillSearchResult.map((skill) => (
                       <button
@@ -173,7 +195,9 @@ const FormSkills: React.FC<{
                       </button>
                     ))
                   ) : (
-                    <div className="text-sm text-center">No skill</div>
+                    <div className="text-sm text-center">
+                      {isLoading ? 'Searching...' : 'No skill'}
+                    </div>
                   )}
                 </div>
               </form>

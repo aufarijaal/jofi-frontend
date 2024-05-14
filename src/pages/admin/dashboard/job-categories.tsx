@@ -2,14 +2,12 @@ import DataManagementLayout from '@/components/data-management-layout'
 import DataTable from '@/components/datatable/datatable'
 import { JobCategoryWithJobsCount } from '@/types'
 import { createColumnHelper } from '@tanstack/react-table'
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import axios from '@/lib/axios'
 import DataTableEditAction from '@/components/datatable/datatable-edit-action'
 import DataTableDeleteAction from '@/components/datatable/datatable-delete-action'
-import { toast } from 'react-toastify'
 import DialogAddUpdateJobCategory from '@/components/dialogs/dialog-add-update-job-category'
 import { showModal } from '@/lib/utils'
-import { JsonView } from 'react-json-view-lite'
 
 const JobCategoriesManagementPage = () => {
   const [loading, setLoading] = useState(true)
@@ -21,6 +19,11 @@ const JobCategoriesManagementPage = () => {
   }>()
   const columnHelper = createColumnHelper<JobCategoryWithJobsCount>()
   const dialogId = useMemo(() => 'dialog-add-update-job-category', [])
+  const [alert, setAlert] = useState<{
+    message: string
+    subMessage?: string
+    type?: 'info' | 'success' | 'warning' | 'error'
+  }>()
 
   const columns = [
     columnHelper.accessor('id', {
@@ -138,6 +141,8 @@ const JobCategoriesManagementPage = () => {
       />
 
       <DataTable
+        loading={loading}
+        alert={alert}
         data={data}
         columns={columns}
         count={count}

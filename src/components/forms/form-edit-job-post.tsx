@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { JobCategory, JobPostForEmployer } from '@/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AxiosError } from 'axios'
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 const FormEditJobPost: React.FC<{
   onSuccess?: (data: any) => void
@@ -13,6 +13,7 @@ const FormEditJobPost: React.FC<{
   existingData: JobPostForEmployer
 }> = ({ onSuccess, formId, existingData }) => {
   const [jobCategories, setJobCategories] = useState<JobCategory[]>()
+  const [loading, setLoading] = useState<string | undefined>(undefined)
 
   const schema = z.object({
     jobCategoryId: z.number().gt(0, { message: 'Job category is required' }),
@@ -50,11 +51,14 @@ const FormEditJobPost: React.FC<{
 
   async function getJobCategories() {
     try {
+      setLoading('loading-job-categories')
       const result = await axios.get('/job-categories')
 
       setJobCategories(result.data.data)
     } catch (error) {
       console.error(error)
+    } finally {
+      setLoading(undefined)
     }
   }
 
@@ -69,7 +73,8 @@ const FormEditJobPost: React.FC<{
       onSuccess?.(data)
     } catch (error) {
       if (error instanceof AxiosError) {
-        console.log(error.response?.data.message)
+        console.error(error.response?.data.message)
+        toast.error(error.response?.data.message)
       }
     }
   }
@@ -97,7 +102,6 @@ const FormEditJobPost: React.FC<{
       onSubmit={form.handleSubmit(submit)}
       id={formId}
     >
-      {form.formState.isDirty ? 'true' : 'false'}
       {form.formState.errors.root && (
         <div className="root-error">
           <p className="text-xs text-error">
@@ -131,23 +135,31 @@ const FormEditJobPost: React.FC<{
         <div className="label">
           <div className="label-text">Job Category</div>
         </div>
-        <select
-          className="select select-sm select-bordered w-full"
-          defaultValue={existingData.jobCategoryId}
-          {...form.register('jobCategoryId', {
-            required: true,
-            valueAsNumber: true,
-          })}
-        >
-          <option disabled value={-1}>
-            Select an option
-          </option>
-          {jobCategories?.map((category) => (
-            <option value={category.id} title={category.slug} key={category.id}>
-              {category.name}
+        {loading && loading === 'loading-job-categories' ? (
+          <div className="skeleton w-full h-[32px]"></div>
+        ) : (
+          <select
+            className="select select-sm select-bordered w-full"
+            defaultValue={existingData.jobCategoryId}
+            {...form.register('jobCategoryId', {
+              required: true,
+              valueAsNumber: true,
+            })}
+          >
+            <option disabled value={-1}>
+              Select an option
             </option>
-          ))}
-        </select>
+            {jobCategories?.map((category) => (
+              <option
+                value={category.id}
+                title={category.slug}
+                key={category.id}
+              >
+                {category.name}
+              </option>
+            ))}
+          </select>
+        )}
         {form.formState.errors.jobCategoryId && (
           <div className="label">
             <span className="label-text-alt text-error">

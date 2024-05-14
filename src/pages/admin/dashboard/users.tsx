@@ -190,6 +190,8 @@ function UsersManagementPage() {
       />
 
       <DataTable
+        loading={loading}
+        alert={alert}
         data={data}
         columns={columns}
         count={count}

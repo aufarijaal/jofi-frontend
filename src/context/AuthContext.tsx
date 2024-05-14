@@ -1,6 +1,5 @@
 import { AxiosError } from 'axios'
 import React, { useEffect } from 'react'
-import { toast } from 'react-toastify'
 import axios from '@/lib/axios'
 
 type User = {
@@ -80,7 +79,7 @@ export const AuthContextProvider = ({
     try {
       setLoading(true)
       const result = await axios.get(`/account/me`)
-  
+
       if (result.status === 200) {
         setUser(result.data.data)
       } else {
@@ -88,8 +87,7 @@ export const AuthContextProvider = ({
         setUser(undefined)
       }
     } catch (error) {
-      // console.log(error)
-      throw error;
+      setUser(undefined)
     } finally {
       setLoading(false)
     }

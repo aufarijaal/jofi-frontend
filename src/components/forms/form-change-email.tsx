@@ -2,9 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { AxiosError } from 'axios'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
 import { z } from 'zod'
 import axios from '@/lib/axios'
+import { toast } from 'sonner'
 
 const FormChangeEmail: React.FC<{
   existingEmail: string
@@ -21,11 +21,15 @@ const FormChangeEmail: React.FC<{
     },
   })
 
+  const [isLoading, setIsloading] = useState(false)
+
   async function onSubmit(data: z.infer<typeof schema>) {
     try {
+      setIsloading(true)
       await axios.put(`/account/settings/email`, data)
 
       onSuccess?.()
+      toast.success("Email updated")
     } catch (error) {
       console.error(error)
 
@@ -33,7 +37,10 @@ const FormChangeEmail: React.FC<{
         form.setError('root', {
           message: error.response?.data.message,
         })
+        toast.error(error.response?.data.message)
       }
+    } finally {
+      setIsloading(false)
     }
   }
   return (
@@ -61,6 +68,7 @@ const FormChangeEmail: React.FC<{
         <input
           type="email"
           placeholder="Type here"
+          disabled={isLoading}
           className="input input-bordered w-full input-sm"
           {...form.register('email', { required: true })}
         />
@@ -73,8 +81,13 @@ const FormChangeEmail: React.FC<{
         )}
       </label>
 
-      <button className="btn btn-sm btn-accent w-max" type="submit">
-        Submit
+      <button
+        className="btn btn-sm btn-accent w-max btn-l"
+        type="submit"
+        disabled={isLoading}
+      >
+        {isLoading && <span className="loading loading-spinner"></span>}
+        {isLoading ? 'Submiting' : 'Submit'}
       </button>
     </form>
   )

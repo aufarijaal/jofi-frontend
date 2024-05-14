@@ -1,7 +1,6 @@
 import { AxiosError } from 'axios'
 import Head from 'next/head'
-import React, { useEffect, useState } from 'react'
-import { toast } from 'react-toastify'
+import { useEffect, useState } from 'react'
 import axios from '@/lib/axios'
 
 function EmployerDashboardApplications() {

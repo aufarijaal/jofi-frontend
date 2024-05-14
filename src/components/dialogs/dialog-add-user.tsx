@@ -4,6 +4,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { CompanyForSelect } from '@/types'
+import { AxiosError } from 'axios'
 
 const DialogAddUser: React.FC<{
   dialogId: string
@@ -48,8 +49,11 @@ const DialogAddUser: React.FC<{
       btnClose.current?.click()
     } catch (error: any) {
       console.error(error)
-
-      setError('root', error.message)
+      if (error instanceof AxiosError) {
+        setError('root', {
+          message: error.response?.data.message,
+        })
+      }
     }
   }
 

@@ -1,5 +1,5 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from '@/lib/axios'
 import Head from 'next/head'
 import { generateCompanyLogoUrl } from '@/lib/utils'
@@ -111,7 +111,7 @@ const JobDetailPage = ({
       console.error(error)
     }
   }
-
+  
   return (
     <main className="min-h-screen w-full pt-24 px-4 max-w-7xl mx-auto pb-10">
       <Head>

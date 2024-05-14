@@ -1,12 +1,8 @@
 import Head from 'next/head'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from '@/lib/axios'
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs'
-import { AxiosError } from 'axios'
-import { useRouter } from 'next/router'
 import { useAuthContext } from '@/context/AuthContext'
-import { GetServerSideProps } from 'next'
-import { toast } from 'react-toastify'
 
 function AdminDashboard() {
   const [loading, setLoading] = useState(true)

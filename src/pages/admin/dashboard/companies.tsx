@@ -1,9 +1,7 @@
 import { generateCompanyLogoUrl, showModal } from '@/lib/utils'
 import { Company, FilterParams } from '@/types'
 import { useEffect, useMemo, useState } from 'react'
-import axios from '@/lib/axios'
 import { Table, createColumnHelper } from '@tanstack/react-table'
-import { AxiosError } from 'axios'
 import DataTable from '@/components/datatable/datatable'
 import DataTableEditAction from '@/components/datatable/datatable-edit-action'
 import DataTableDeleteAction from '@/components/datatable/datatable-delete-action'
@@ -11,7 +9,6 @@ import DialogAddCompany from '@/components/dialogs/dialog-add-company'
 import FormUploadCompanyLogo from '@/components/form-upload-company-logo'
 import DialogEditCompany from '@/components/dialogs/dialog-edit-company'
 import DataManagementLayout from '@/components/data-management-layout'
-import { toast } from 'react-toastify'
 import useDialog from '@/hooks/useDialog'
 import * as company from '@/services/company-service'
 
@@ -24,6 +21,12 @@ function CompaniesManagementPage() {
   const [existingData, setExistingData] = useState<Company>()
   const dialogAddCompanyId = useMemo(() => 'dialog-add-company', [])
   const dialogEditCompanyId = useMemo(() => 'dialog-edit-company', [])
+  const [loading, setLoading] = useState(false)
+  const [alert, setAlert] = useState<{
+    message: string
+    subMessage?: string
+    type?: 'info' | 'success' | 'warning' | 'error'
+  }>()
 
   const columns = [
     columnHelper.accessor('id', {
@@ -81,12 +84,20 @@ function CompaniesManagementPage() {
           <FormUploadCompanyLogo
             id={parseInt(info.row.id)}
             onSuccess={() => {
-              console.log('Company image uploaded successfully uploaded', {
+              setAlert({
+                message: 'Success',
+                subMessage: 'Logo changed successfully',
                 type: 'success',
               })
               getCompanies()
             }}
-            onError={(error) => console.log(error.message)}
+            onError={(error) => {
+              setAlert({
+                message: 'Error',
+                subMessage: error.response?.data.message,
+                type: 'error',
+              })
+            }}
             title="Change image"
           />
           <DataTableEditAction
@@ -132,12 +143,15 @@ function CompaniesManagementPage() {
 
   async function getCompanies(params?: FilterParams) {
     try {
+      setLoading(true)
       const result = await company.get(params)
 
       setData(result?.companies)
       setCount(result?.count)
     } catch (error: any) {
       console.log(error.message)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -171,6 +185,8 @@ function CompaniesManagementPage() {
 
       {/* Data table */}
       <DataTable
+        alert={alert}
+        loading={loading}
         data={data}
         columns={columns}
         count={count ?? 0}

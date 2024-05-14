@@ -1,8 +1,9 @@
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs'
-import React from 'react'
+import React, { useState } from 'react'
 import axios from '@/lib/axios'
 import { useAuthContext } from '@/context/AuthContext'
 import { useRouter } from 'next/router'
+import { AxiosError } from 'axios'
 
 function BtnToggleSaveJob({
   saved,
@@ -19,29 +20,42 @@ function BtnToggleSaveJob({
   jobId: number
   onToggle?: () => void
 }) {
-  const auth = useAuthContext();
-  const router = useRouter();
+  const auth = useAuthContext()
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
 
   async function handleClick(e: any) {
     e.stopPropagation()
     e.preventDefault()
 
-    if(!auth?.user) {
-      return router.push('/auth/signin')
+    try {
+      setLoading(true)
+
+      if (!auth?.user) {
+        return router.push('/auth/signin')
+      }
+
+      if (saved && jobId) {
+        await axios.delete(`/saved-jobs/${jobId}`)
+      } else
+        await axios.post(`/saved-jobs`, {
+          jobId,
+        })
+
+      onToggle?.()
+    } catch (error: any) {
+      alert(
+        error instanceof AxiosError
+          ? error.response?.data.message
+          : error.message
+      )
+    } finally {
+      setLoading(false)
     }
-
-    if (saved && jobId) {
-      await axios.delete(`/saved-jobs/${jobId}`)
-    } else
-      await axios.post(`/saved-jobs`, {
-        jobId,
-      })
-
-    onToggle?.()
   }
 
   return (
-    <button className={className} onClick={handleClick}>
+    <button className={className} onClick={handleClick} disabled={loading}>
       {saved ? (
         <>
           <Icon

@@ -1,5 +1,4 @@
 import axios, { AxiosError } from 'axios'
-import { getCookie } from 'cookies-next'
 
 const baseURL = process.env.NEXT_PUBLIC_SERVER_HOST
 
@@ -25,6 +24,21 @@ axios.interceptors.response.use(
       //     return reject(error)
       //   }
       // }
+
+      if(error) {
+        switch (error.response?.status) {
+          case 403:
+            window.location.href = '/forbidden'
+            break;
+          case 401:
+            if(error.config?.url !== '/account/me') window.location.href = '/unauthorized'
+            break;
+          case 404: 
+            window.location.href = '/404'
+          default:
+            break;
+        }
+      }
 
       // else if (
       //   error.response &&

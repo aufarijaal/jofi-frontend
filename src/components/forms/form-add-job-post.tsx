@@ -7,7 +7,6 @@ import { z } from 'zod'
 import { JobCategory } from '@/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AxiosError } from 'axios'
-import { toast } from 'react-toastify'
 
 const FormAddJobPost: React.FC<{
   onSuccess?: (data: any) => void

@@ -4,9 +4,9 @@ import { Icon } from '@iconify-icon/react/dist/iconify.mjs'
 import { AxiosError } from 'axios'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
 import { z } from 'zod'
 import axios from '@/lib/axios'
+import { toast } from 'sonner'
 
 const FormPhotoProfile: React.FC<{
   existingPhoto?: string
@@ -20,6 +20,7 @@ const FormPhotoProfile: React.FC<{
         message: 'File is not type of image',
       }),
   })
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -27,6 +28,7 @@ const FormPhotoProfile: React.FC<{
 
   async function onSubmit(data: z.infer<typeof schema>) {
     try {
+      setIsLoading(true)
       const formData = new FormData()
 
       formData.append('pp', data.pp)
@@ -35,14 +37,18 @@ const FormPhotoProfile: React.FC<{
 
       onSuccess?.()
       form.reset()
+      toast.success("Photo profile updated")
     } catch (error) {
       console.error(error)
-
+      
       if (error instanceof AxiosError) {
         form.setError('root', {
           message: error.response?.data.message,
         })
+        toast.error(error.response?.data.message)
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -105,6 +111,7 @@ const FormPhotoProfile: React.FC<{
             type="file"
             className="file-input file-input-bordered w-full max-w-xs file-input-sm"
             accept="image/*"
+            disabled={isLoading}
             {...form.register('pp', { required: true })}
           />
           {form.formState.errors?.pp?.message && (
@@ -117,8 +124,13 @@ const FormPhotoProfile: React.FC<{
         </label>
       </div>
 
-      <button className="btn btn-sm btn-accent w-max" type="submit">
-        Submit
+      <button
+        className="btn btn-sm btn-accent w-max btn-l"
+        type="submit"
+        disabled={isLoading}
+      >
+        {isLoading && <span className="loading loading-spinner"></span>}
+        {isLoading ? 'Submiting' : 'Submit'}
       </button>
     </form>
   )

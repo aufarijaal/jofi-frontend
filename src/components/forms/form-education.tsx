@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import React from 'react'
+import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import axios from '@/lib/axios'
 import { AxiosError } from 'axios'
 import dayjs from 'dayjs'
+import { toast } from 'sonner'
 
 const FormEducation: React.FC<{
   onSuccess?: () => void
@@ -37,10 +38,14 @@ const FormEducation: React.FC<{
       message: 'Please select the education level',
       path: ['level'],
     })
-    .refine((data) => data.isCurrent && !data.endDate || !data.isCurrent && data.endDate, {
-      message: 'Please fill the end date if you are already graduated.',
-      path: ['endDate'],
-    })
+    .refine(
+      (data) =>
+        (data.isCurrent && !data.endDate) || (!data.isCurrent && data.endDate),
+      {
+        message: 'Please fill the end date if you are already graduated.',
+        path: ['endDate'],
+      }
+    )
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -58,8 +63,11 @@ const FormEducation: React.FC<{
     },
   })
 
+  const [isLoading, setIsLoading] = useState(false)
+
   async function onSubmit(data: z.infer<typeof schema>) {
     try {
+      setIsLoading(true)
       await axios(`/education`, {
         method: existing?.id ? 'PUT' : 'POST',
         data: {
@@ -70,6 +78,7 @@ const FormEducation: React.FC<{
 
       onSuccess?.()
       form.reset()
+      toast.success(existing?.id ? "Educations updated" : "New education item added")
     } catch (error) {
       console.error(error)
 
@@ -77,7 +86,10 @@ const FormEducation: React.FC<{
         form.setError('root', {
           message: error.response?.data.message,
         })
+        toast.error(error.response?.data.message)
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -103,6 +115,7 @@ const FormEducation: React.FC<{
           type="text"
           placeholder="example: Computer Science"
           className="input input-bordered w-full input-sm"
+          disabled={isLoading}
           {...form.register('major', { required: true })}
         />
         {form.formState.errors.major?.message && (
@@ -122,6 +135,7 @@ const FormEducation: React.FC<{
           type="text"
           placeholder="example: Oxford University"
           className="input input-bordered w-full input-sm"
+          disabled={isLoading}
           {...form.register('institution', { required: true })}
         />
         {form.formState.errors.institution?.message && (
@@ -139,6 +153,7 @@ const FormEducation: React.FC<{
         </div>
         <select
           className="select select-sm select-bordered w-full"
+          disabled={isLoading}
           defaultValue={''}
           {...form.register('level', { required: true })}
         >
@@ -174,6 +189,7 @@ const FormEducation: React.FC<{
           type="month"
           placeholder="Type here"
           className="input input-bordered w-full input-sm"
+          disabled={isLoading}
           {...form.register('startDate', { required: true })}
         />
         {form.formState.errors.startDate?.message && (
@@ -193,7 +209,7 @@ const FormEducation: React.FC<{
           type="month"
           placeholder="Type here"
           className="input input-bordered w-full input-sm"
-          disabled={form.watch('isCurrent')}
+          disabled={form.watch('isCurrent') || isLoading}
           {...form.register('endDate', { required: true })}
         />
         {form.formState.errors.endDate?.message && (
@@ -211,13 +227,19 @@ const FormEducation: React.FC<{
           <input
             type="checkbox"
             className="checkbox checkbox-accent"
+            disabled={isLoading}
             {...form.register('isCurrent')}
           />
         </label>
       </div>
 
-      <button className="btn btn-sm btn-accent w-max" type="submit">
-        Submit
+      <button
+        className="btn btn-sm btn-accent w-max btn-l"
+        type="submit"
+        disabled={isLoading}
+      >
+        {isLoading && <span className="loading loading-spinner"></span>}
+        {isLoading ? 'Submiting' : 'Submit'}
       </button>
     </form>
   )

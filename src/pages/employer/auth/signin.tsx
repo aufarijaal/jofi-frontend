@@ -97,19 +97,20 @@ function EmployerSigninPage() {
               />
               <div className="flex items-center gap-2">
                 <div className="label">
-                  {form.formState.errors.password?.message && (
+                  {form.formState.errors.password?.message ? (
                     <div className="label-text-alt text-error">
                       {form.formState.errors.password.message}
                     </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-xs"
+                        onChange={(e) => setShowPass(e.target.checked)}
+                      />
+                      <span className="label-text text-xs">Show</span>
+                    </div>
                   )}
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      className="checkbox checkbox-xs"
-                      onChange={(e) => setShowPass(e.target.checked)}
-                    />
-                    <span className="label-text text-xs">Show</span>
-                  </div>
                 </div>
               </div>
             </label>

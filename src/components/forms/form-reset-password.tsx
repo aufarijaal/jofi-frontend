@@ -2,9 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { AxiosError } from 'axios'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
 import { z } from 'zod'
 import axios from '@/lib/axios'
+import { toast } from 'sonner'
 
 const FormResetPassword: React.FC<{ onSuccess?: () => void }> = ({
   onSuccess,
@@ -28,24 +28,28 @@ const FormResetPassword: React.FC<{ onSuccess?: () => void }> = ({
     resolver: zodResolver(schema),
   })
 
+  const [isLoading, setIsloading] = useState(false)
+
   async function onSubmit(data: z.infer<typeof schema>) {
     try {
+      setIsloading(true)
       await axios.put(`/account/settings/password-reset`, {
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
       })
 
       onSuccess?.()
+      form.reset()
+      toast.success("Password reset successfully")
     } catch (error) {
-      console.error(error)
-
       if (error instanceof AxiosError) {
         form.setError('root', {
           message: error.response?.data.message,
         })
+        toast.error(error.response?.data.message)
       }
     } finally {
-      form.reset()
+      setIsloading(false)
     }
   }
   return (
@@ -74,6 +78,7 @@ const FormResetPassword: React.FC<{ onSuccess?: () => void }> = ({
           type={showCurrentPass ? 'text' : 'password'}
           placeholder="Type here"
           className="input input-bordered w-full input-sm"
+          disabled={isLoading}
           {...form.register('currentPassword', { required: true })}
         />
         <div className="flex items-center gap-2">
@@ -103,6 +108,7 @@ const FormResetPassword: React.FC<{ onSuccess?: () => void }> = ({
           type={showPass ? 'text' : 'password'}
           placeholder="Type here"
           className="input input-bordered w-full input-sm"
+          disabled={isLoading}
           {...form.register('newPassword', { required: true })}
         />
         <div className="flex items-center gap-2">
@@ -132,6 +138,7 @@ const FormResetPassword: React.FC<{ onSuccess?: () => void }> = ({
           type={showConfirmPass ? 'text' : 'password'}
           placeholder="Type here"
           className="input input-bordered w-full input-sm"
+          disabled={isLoading}
           {...form.register('confirmPassword', { required: true })}
         />
         <div className="flex items-center gap-2">
@@ -153,8 +160,13 @@ const FormResetPassword: React.FC<{ onSuccess?: () => void }> = ({
         </div>
       </label>
 
-      <button className="btn btn-sm btn-accent w-max" type="submit">
-        Submit
+      <button
+        className="btn btn-sm btn-accent w-max btn-l"
+        type="submit"
+        disabled={isLoading}
+      >
+        {isLoading && <span className="loading loading-spinner"></span>}
+        {isLoading ? 'Submiting' : 'Submit'}
       </button>
     </form>
   )

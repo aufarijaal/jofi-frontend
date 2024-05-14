@@ -1,21 +1,16 @@
 import FormProfileAbout from '@/components/forms/form-profile-about'
 import SettingsPageLayout from '@/components/settings-page-layout'
 import { GetServerSideProps } from 'next'
-import Head from 'next/head'
 import { useRouter } from 'next/router'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import axios from '@/lib/axios'
-import { JsonView } from 'react-json-view-lite'
-import { toast } from 'react-toastify'
 import useAlert from '@/hooks/useAlert'
 import FormJobExperiences from '@/components/forms/form-job-experiences'
-import dayjs from 'dayjs'
 import { cn } from '@/lib/utils'
 import JobExperienceCard from '@/components/job-experience-card'
 import EducationCard from '@/components/education-card'
 import FormEducation from '@/components/forms/form-education'
 import FormSkills from '@/components/forms/form-skills'
-import { Icon } from '@iconify-icon/react/dist/iconify.mjs'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const result = await axios.get(`/account/profile`, {
@@ -40,6 +35,8 @@ const ProfilePage = ({ info }: any) => {
   const [educationToEdit, setEducationToEdit] = useState()
   const [showFormEdu, setShowFormEdu] = useState(false)
   const [editSkills, setEditSkills] = useState(false)
+  const [eduLoading, setEduLoading] = useState(false)
+  const [expLoading, setExpLoading] = useState(false)
 
   function refresh() {
     router.replace(router.asPath)
@@ -47,6 +44,7 @@ const ProfilePage = ({ info }: any) => {
 
   async function deleteJobExperience(id: number) {
     try {
+      setExpLoading(true)
       if (confirm(`Are you sure want to delete this job experience data?`)) {
         await axios.delete(`/job-experience/${id}`)
 
@@ -54,11 +52,14 @@ const ProfilePage = ({ info }: any) => {
       }
     } catch (error) {
       console.error(error)
+    } finally {
+      setExpLoading(false)
     }
   }
 
   async function deleteEducation(id: number) {
     try {
+      setEduLoading(true)
       if (confirm(`Are you sure want to delete this education data?`)) {
         await axios.delete(`/education/${id}`)
 
@@ -66,6 +67,8 @@ const ProfilePage = ({ info }: any) => {
       }
     } catch (error) {
       console.error(error)
+    } finally {
+      setEduLoading(false)
     }
   }
 
@@ -77,10 +80,6 @@ const ProfilePage = ({ info }: any) => {
         <FormProfileAbout
           onSuccess={() => {
             refresh()
-            setAlert({
-              message: 'About updated successfully',
-              type: 'success',
-            })
           }}
           existingAbout={info.profile.about}
         />
@@ -103,10 +102,7 @@ const ProfilePage = ({ info }: any) => {
         </div>
 
         <div className="mt-2">
-          <FormSkills
-            existing={info.userSkills}
-            editMode={editSkills}
-          />
+          <FormSkills existing={info.userSkills} editMode={editSkills} />
         </div>
       </div>
 
@@ -147,6 +143,7 @@ const ProfilePage = ({ info }: any) => {
               onDeleteClick={() => {
                 deleteJobExperience(xp.id)
               }}
+              loading={expLoading}
             />
           ))}
         </div>
@@ -155,10 +152,6 @@ const ProfilePage = ({ info }: any) => {
           <FormJobExperiences
             onSuccess={() => {
               refresh()
-              setAlert({
-                message: 'Job experience updated',
-                type: 'success',
-              })
               setShowFormJobXp(false)
               setJobXpToEdit(undefined)
             }}
@@ -204,6 +197,7 @@ const ProfilePage = ({ info }: any) => {
               onDeleteClick={() => {
                 deleteEducation(edu.id)
               }}
+              loading={eduLoading}
             />
           ))}
         </div>
@@ -212,10 +206,6 @@ const ProfilePage = ({ info }: any) => {
           <FormEducation
             onSuccess={() => {
               refresh()
-              setAlert({
-                message: 'Education updated',
-                type: 'success',
-              })
               setShowFormEdu(false)
               setEducationToEdit(undefined)
             }}

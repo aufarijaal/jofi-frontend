@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import React from 'react'
+import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import axios from '@/lib/axios'
 import { AxiosError } from 'axios'
 import dayjs from 'dayjs'
+import { toast } from 'sonner'
 
 const FormJobExperiences: React.FC<{
   onSuccess?: () => void
@@ -28,7 +29,8 @@ const FormJobExperiences: React.FC<{
       isCurrent: z.boolean(),
     })
     .refine(
-      (data) => data.isCurrent && !data.endDate || !data.isCurrent && data.endDate,
+      (data) =>
+        (data.isCurrent && !data.endDate) || (!data.isCurrent && data.endDate),
       {
         message:
           'Please fill the end date if you are not working at this company anymore.',
@@ -55,8 +57,11 @@ const FormJobExperiences: React.FC<{
     },
   })
 
+  const [isLoading, setIsLoading] = useState(false)
+
   async function onSubmit(data: z.infer<typeof schema>) {
     try {
+      setIsLoading(true)
       await axios(`/job-experience`, {
         method: existing?.id ? 'PUT' : 'POST',
         data: {
@@ -67,14 +72,16 @@ const FormJobExperiences: React.FC<{
 
       onSuccess?.()
       form.reset()
+      toast.success(existing?.id ? "Job experience updated" : "New job experience added")
     } catch (error) {
-      console.error(error)
-
       if (error instanceof AxiosError) {
         form.setError('root', {
           message: error.response?.data.message,
         })
+        toast.error(error.response?.data.message)
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -100,6 +107,7 @@ const FormJobExperiences: React.FC<{
           type="text"
           placeholder="example: Network Administrator"
           className="input input-bordered w-full input-sm"
+          disabled={isLoading}
           {...form.register('title', { required: true })}
         />
         {form.formState.errors.title?.message && (
@@ -119,6 +127,7 @@ const FormJobExperiences: React.FC<{
           type="text"
           placeholder="example: Greenfields"
           className="input input-bordered w-full input-sm"
+          disabled={isLoading}
           {...form.register('companyName', { required: true })}
         />
         {form.formState.errors.companyName?.message && (
@@ -138,6 +147,7 @@ const FormJobExperiences: React.FC<{
           type="month"
           placeholder="Type here"
           className="input input-bordered w-full input-sm"
+          disabled={isLoading}
           {...form.register('startDate', { required: true })}
         />
         {form.formState.errors.startDate?.message && (
@@ -157,7 +167,7 @@ const FormJobExperiences: React.FC<{
           type="month"
           placeholder="Type here"
           className="input input-bordered w-full input-sm"
-          disabled={form.watch('isCurrent')}
+          disabled={form.watch('isCurrent') || isLoading}
           {...form.register('endDate', { required: true })}
         />
         {form.formState.errors.endDate?.message && (
@@ -175,13 +185,19 @@ const FormJobExperiences: React.FC<{
           <input
             type="checkbox"
             className="checkbox checkbox-accent"
+            disabled={isLoading}
             {...form.register('isCurrent')}
           />
         </label>
       </div>
 
-      <button className="btn btn-sm btn-accent w-max" type="submit">
-        Submit
+      <button
+        className="btn btn-sm btn-accent w-max btn-l"
+        type="submit"
+        disabled={isLoading}
+      >
+        {isLoading && <span className="loading loading-spinner"></span>}
+        {isLoading ? 'Submiting' : 'Submit'}
       </button>
     </form>
   )

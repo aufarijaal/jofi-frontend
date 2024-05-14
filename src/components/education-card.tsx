@@ -14,12 +14,14 @@ interface Props {
   }
   onDeleteClick?: (id: number) => void
   onEditClick?: (id: number) => void
+  loading?: boolean
 }
 
 const EducationCard: React.FC<Props> = ({
   data,
   onDeleteClick,
   onEditClick,
+  loading,
 }) => {
   return (
     <div className="education-item-wrapper flex max-w-md min-w-[400px] gap-2">
@@ -51,12 +53,14 @@ const EducationCard: React.FC<Props> = ({
         <button
           className="btn btn-success h-full"
           onClick={() => onEditClick?.(data.id)}
+          disabled={loading}
         >
           <Icon icon="mdi:pencil" />
         </button>
         <button
           className="btn btn-error h-full"
           onClick={() => onDeleteClick?.(data.id)}
+          disabled={loading}
         >
           <Icon icon="mdi:trash-can" />
         </button>

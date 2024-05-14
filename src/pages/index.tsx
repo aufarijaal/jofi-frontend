@@ -114,18 +114,24 @@ export default function Home({ jobs, jobCategoriesProps, pagination }: any) {
 
       {/* Job post list */}
       <div id="job-list-container" className="mt-6">
-        <div
-          id="job-list"
-          className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4"
-        >
-          {jobs.map((job: any, i: number) => (
-            <JobCard
-              key={i}
-              jobData={job}
-              onSaveToggle={() => router.replace(router.asPath)}
-            />
-          ))}
-        </div>
+        {jobs.length > 0 ? (
+          <div
+            id="job-list"
+            className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4"
+          >
+            {jobs.map((job: any, i: number) => (
+              <JobCard
+                key={i}
+                jobData={job}
+                onSaveToggle={() => router.replace(router.asPath)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="grid place-items-center w-full text-secondary text-sm h-[100px]">
+            {'No result for ' + router.query.q}
+          </div>
+        )}
 
         <div className="w-full mt-6 flex justify-end gap-2">
           <button

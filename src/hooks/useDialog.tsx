@@ -15,6 +15,7 @@ export default function useDialog() {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const btnClose = useRef<HTMLButtonElement>(null)
   const [showState, setShowState] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   function show() {
     setShowState(true)
@@ -32,6 +33,11 @@ export default function useDialog() {
     }
   }, [showState])
 
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  
+
   const Dialog: React.FC<DialogProps> = ({
     title,
     subtitle,
@@ -41,12 +47,13 @@ export default function useDialog() {
     onClose,
     modalBoxClassName,
   }) => {
-    return showState ? (
+    return showState && mounted ? (
       <dialog
         id={dialogId}
         className="modal"
         ref={dialogRef}
         onCancel={() => close()}
+        role="dialog"
       >
         <div className={cn('modal-box', modalBoxClassName)}>
           <h3 className="font-bold text-lg">{title}</h3>

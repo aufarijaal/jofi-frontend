@@ -1,26 +1,16 @@
 import DataManagementLayout from '@/components/data-management-layout'
 import { ApplicantDetails, FilterParams } from '@/types'
 import React, { useEffect, useMemo, useState } from 'react'
-import { toast } from 'react-toastify'
 import axios from '@/lib/axios'
 import DataTable from '@/components/datatable/datatable'
 import {
-  CellContext,
-  ColumnDef,
-  createColumnHelper,
+  CellContext, createColumnHelper
 } from '@tanstack/react-table'
-import {
-  JsonView,
-  allExpanded,
-  darkStyles,
-  defaultStyles,
-} from 'react-json-view-lite'
 import 'react-json-view-lite/dist/index.css'
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs'
 import useDialog from '@/hooks/useDialog'
 import * as changeCase from 'change-case'
 import { AxiosError } from 'axios'
-import { generatePhotoProfileUrl } from '@/lib/utils'
 import ApplicantDetailsWrapper from '@/components/applicant-details/applicant-details'
 
 type ApplicationStatus =
@@ -126,6 +116,13 @@ const EmployerManageApplicationsPage = () => {
   const [count, setCount] = useState(0)
   const [applicantDetails, setApplicantDetails] = useState<ApplicantDetails>()
   const ApplicantDetailsDialog = useDialog()
+  const [loading, setLoading] = useState(false)
+  const [loadingApplicantDetail, setLoadingApplicantDetail] = useState(false)
+  const [alert, setAlert] = useState<{
+    message: string
+    subMessage?: string
+    type?: 'info' | 'success' | 'warning' | 'error'
+  }>()
 
   const columnHelper = createColumnHelper<Application>()
 
@@ -149,7 +146,7 @@ const EmployerManageApplicationsPage = () => {
           }}
         >
           {info.getValue()}
-          <button className="bg-accent rounded-full w-4 h-4 text-accent-content">
+          <button className="bg-accent rounded-full w-4 h-4 text-accent-content disabled:cursor-not-allowed" disabled={loadingApplicantDetail}>
             <Icon icon="mdi:information-symbol" width="16" height="16" />
           </button>
         </div>
@@ -205,6 +202,7 @@ const EmployerManageApplicationsPage = () => {
 
   async function getApplications(params?: FilterParams) {
     try {
+      setLoading(true)
       const result = await axios.get(`/companies/applications`, {
         params: {
           dataPerPage: params?.pageSize,
@@ -219,11 +217,14 @@ const EmployerManageApplicationsPage = () => {
       console.error(error)
 
       console.log(error.message)
+    } finally {
+      setLoading(false)
     }
   }
 
   async function getApplicantDetails(applicantId: number) {
     try {
+      setLoadingApplicantDetail(true)
       const result = await axios.get(
         `/applications/${applicantId}/applicant-details`
       )
@@ -235,6 +236,8 @@ const EmployerManageApplicationsPage = () => {
       if (error instanceof AxiosError) {
         console.log(error.response?.data.message)
       }
+    } finally {
+      setLoadingApplicantDetail(false)
     }
   }
 
@@ -261,6 +264,8 @@ const EmployerManageApplicationsPage = () => {
       </ApplicantDetailsDialog.Dialog>
 
       <DataTable
+        loading={loading}
+        alert={alert}
         columns={columns}
         data={data}
         count={count}

@@ -121,6 +121,8 @@ function EmployerRequestsPage() {
       title="Admin Dashboard - Employer requests | JoFi"
     >
       <DataTable
+        loading={loading}
+        alert={alert}
         noSelection
         data={data}
         columns={columns}

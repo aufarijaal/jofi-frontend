@@ -23,11 +23,17 @@ function JobSeekerSigninPage() {
     resolver: zodResolver(schema),
   })
 
+  const [loading, setLoading] = useState(false)
+
   async function onSubmit(data: z.infer<typeof schema>) {
     try {
-      const result = await auth?.signIn({ email: data.email, password: data.password })
+      setLoading(true)
+      const result = await auth?.signIn({
+        email: data.email,
+        password: data.password,
+      })
 
-      if(result) {
+      if (result) {
         return router.push(`/`)
       }
     } catch (error) {
@@ -36,6 +42,8 @@ function JobSeekerSigninPage() {
       if (error instanceof AxiosError) {
         form.setError('root', { message: error.response?.data.message })
       }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -100,24 +108,30 @@ function JobSeekerSigninPage() {
               />
               <div className="flex items-center gap-2">
                 <div className="label">
-                  {form.formState.errors.password?.message && (
+                  {form.formState.errors.password?.message ? (
                     <div className="label-text-alt text-error">
                       {form.formState.errors.password.message}
                     </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-xs"
+                        onChange={(e) => setShowPass(e.target.checked)}
+                      />
+                      <span className="label-text text-xs">Show</span>
+                    </div>
                   )}
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      className="checkbox checkbox-xs"
-                      onChange={(e) => setShowPass(e.target.checked)}
-                    />
-                    <span className="label-text text-xs">Show</span>
-                  </div>
                 </div>
               </div>
             </label>
 
-            <button className="btn btn-primary btn-sm mt-4" type="submit">
+            <button
+              className="btn btn-primary btn-sm mt-4"
+              type="submit"
+              disabled={loading}
+            >
+              {loading && <span className="loading loading-spinner"></span>}
               Submit
             </button>
 

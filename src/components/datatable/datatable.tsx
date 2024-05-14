@@ -1,3 +1,4 @@
+import useAlert from '@/hooks/useAlert'
 import { Icon } from '@iconify-icon/react'
 import {
   Cell,
@@ -33,6 +34,12 @@ interface Props {
   additionalToolbarButtons?: (table: Table<any>) => React.ReactNode
   onSearch?: (keyword: string, table: Table<any>) => void
   searchPlaceholderText?: string
+  loading?: boolean
+  alert?: {
+    message: string
+    subMessage?: string
+    type?: 'info' | 'success' | 'warning' | 'error'
+  }
 }
 
 const DataTable: React.FC<Props> = ({
@@ -49,6 +56,8 @@ const DataTable: React.FC<Props> = ({
   additionalToolbarButtons,
   onSearch,
   searchPlaceholderText,
+  loading,
+  alert,
 }) => {
   const [pagination, setPagination] = useState({
     pageIndex: 0, //initial page index
@@ -61,6 +70,7 @@ const DataTable: React.FC<Props> = ({
   const [rowEditing, setRowEditing] = useState<number[]>(() => [])
   const [globalFilter, setGlobalFilter] = useState('')
   const [debouncedGlobalFilter] = useDebounce(globalFilter, 500)
+  const Alert = useAlert()
 
   const table = useReactTable({
     data,
@@ -117,8 +127,22 @@ const DataTable: React.FC<Props> = ({
     onSearch?.(debouncedGlobalFilter, table)
   }, [debouncedGlobalFilter])
 
+  useEffect(() => {
+    if(alert) {
+      Alert.setAlert({
+        message: alert?.message,
+        subMessage: alert?.subMessage,
+        type: alert?.type
+      })
+    }
+  }, [alert])
+
   return (
     <div>
+      <div className="alert-container">
+        <Alert.Alert dismissable/>
+      </div>
+
       <div className="table-toolbar flex justify-between my-4 items-center">
         {/* Row selection count label */}
         <div>
@@ -256,31 +280,34 @@ const DataTable: React.FC<Props> = ({
       </div>
 
       <div className="overflow-x-auto">
-        <table className="table table-xs table-zebra border border-y border-[var(--fallback-bc,oklch(var(--bc)/0.2))]">
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} className="h-10">
-                {!noSelection && (
-                  <th className="border border-[var(--fallback-bc,oklch(var(--bc)/0.2))] w-10">
-                    <input
-                      type="checkbox"
-                      checked={table.getIsAllRowsSelected()}
-                      onChange={table.getToggleAllRowsSelectedHandler()}
-                      className="checkbox checkbox-xs"
-                    />
-                  </th>
-                )}
+        {loading ? (
+          <div className="skeleton h-[441px] w-full"></div>
+        ) : (
+          <table className="table table-xs table-zebra border border-y border-[var(--fallback-bc,oklch(var(--bc)/0.2))]">
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id} className="h-10">
+                  {!noSelection && (
+                    <th className="border border-[var(--fallback-bc,oklch(var(--bc)/0.2))] w-10">
+                      <input
+                        type="checkbox"
+                        checked={table.getIsAllRowsSelected()}
+                        onChange={table.getToggleAllRowsSelectedHandler()}
+                        className="checkbox checkbox-xs"
+                      />
+                    </th>
+                  )}
 
-                {headerGroup.headers.map((header) => (
-                  <th key={header.id}>
-                    <div className="flex items-center gap-2">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                      {/* <Icon
+                  {headerGroup.headers.map((header) => (
+                    <th key={header.id}>
+                      <div className="flex items-center gap-2">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                        {/* <Icon
                       width="16"
                       height="16"
                       icon="icon-park-outline:sort"
@@ -290,58 +317,58 @@ const DataTable: React.FC<Props> = ({
                       height="16"
                       icon="icon-park-solid:sort"
                     /> */}
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.length > 0 ? (
-              table.getRowModel().rows.map((row, i) => (
-                <React.Fragment key={i}>
-                  <tr
-                    key={row.id}
-                    className={[
-                      'select-none cursor-pointer',
-                      row.getIsSelected()
-                        ? 'bg-base-300 text-base-content'
-                        : 'hover',
-                    ]
-                      .join(' ')
-                      .trim()}
-                    onClick={() => {
-                      if (!noSelection) row.toggleSelected()
-                    }}
-                  >
-                    {!noSelection && (
-                      <td className="border border-[var(--fallback-bc,oklch(var(--bc)/0.2))]">
-                        <input
-                          type="checkbox"
-                          className="checkbox checkbox-xs"
-                          checked={row.getIsSelected()}
-                          disabled={!row.getCanSelect()}
-                          onChange={row.getToggleSelectedHandler()}
-                        />
-                      </td>
-                    )}
-                    {row.getVisibleCells().map((cell) => (
-                      <td
-                        key={cell.id}
-                        className={`border border-[var(--fallback-bc,oklch(var(--bc)/0.2))] ${
-                          cell.column.columnDef.meta?.className ?? ''
-                        } ${cell.getValue() ? '' : 'text-secondary'}`}
-                        title={
-                          typeof cell.getValue() === 'string'
-                            ? (cell.getValue() as string)
-                            : ''
-                        }
-                      >
-                        {renderValue(cell)}
-                      </td>
-                    ))}
-                  </tr>
-                  {/* {i === 2 && (
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {table.getRowModel().rows.length > 0 ? (
+                table.getRowModel().rows.map((row, i) => (
+                  <React.Fragment key={i}>
+                    <tr
+                      key={row.id}
+                      className={[
+                        'select-none cursor-pointer',
+                        row.getIsSelected()
+                          ? 'bg-base-300 text-base-content'
+                          : 'hover',
+                      ]
+                        .join(' ')
+                        .trim()}
+                      onClick={() => {
+                        if (!noSelection) row.toggleSelected()
+                      }}
+                    >
+                      {!noSelection && (
+                        <td className="border border-[var(--fallback-bc,oklch(var(--bc)/0.2))]">
+                          <input
+                            type="checkbox"
+                            className="checkbox checkbox-xs"
+                            checked={row.getIsSelected()}
+                            disabled={!row.getCanSelect()}
+                            onChange={row.getToggleSelectedHandler()}
+                          />
+                        </td>
+                      )}
+                      {row.getVisibleCells().map((cell) => (
+                        <td
+                          key={cell.id}
+                          className={`border border-[var(--fallback-bc,oklch(var(--bc)/0.2))] ${
+                            cell.column.columnDef.meta?.className ?? ''
+                          } ${cell.getValue() ? '' : 'text-secondary'}`}
+                          title={
+                            typeof cell.getValue() === 'string'
+                              ? (cell.getValue() as string)
+                              : ''
+                          }
+                        >
+                          {renderValue(cell)}
+                        </td>
+                      ))}
+                    </tr>
+                    {/* {i === 2 && (
                     <tr className="h-max w-full">
                       <td
                         className="border border-[var(--fallback-bc,oklch(var(--bc)/0.2))]"
@@ -364,45 +391,44 @@ const DataTable: React.FC<Props> = ({
                       </td>
                     </tr>
                   )} */}
-                </React.Fragment>
-              ))
-            ) : (
-              <tr className="h-[300px]">
-                <td className="w-full" colSpan={columns.length}>
-                  <div className="flex justify-center flex-col gap-6 items-center">
-                    <img
-                      src="/undraw_void_-3-ggu.svg"
-                      alt="no data"
-                      className="w-52"
-                    />
-                    <div className="text-secondary font-bold text-lg">
-                      No Data
+                  </React.Fragment>
+                ))
+              ) : (
+                <tr className="h-[300px]">
+                  <td className="w-full" colSpan={columns.length}>
+                    <div className="flex justify-center flex-col gap-6 items-center">
+                      <img
+                        src="/undraw_void_-3-ggu.svg"
+                        alt="no data"
+                        className="w-52"
+                      />
+                      <div className="text-secondary font-bold text-lg">
+                        No Data
+                      </div>
                     </div>
-                  </div>
-                </td>
-              </tr>
-            )}
-          </tbody>
-
-          <tfoot className="border border-[var(--fallback-bc,oklch(var(--bc)/0.2))]">
-            {table.getFooterGroups().map((footerGroup) => (
-              <tr key={footerGroup.id} className="h-10">
-                {!noSelection && <th></th>}
-                {footerGroup.headers.map((header) => (
-                  <th key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.footer,
-                          header.getContext()
-                        )}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </tfoot>
-        </table>
-
+                  </td>
+                </tr>
+              )}
+            </tbody>
+            <tfoot className="border border-[var(--fallback-bc,oklch(var(--bc)/0.2))]">
+              {table.getFooterGroups().map((footerGroup) => (
+                <tr key={footerGroup.id} className="h-10">
+                  {!noSelection && <th></th>}
+                  {footerGroup.headers.map((header) => (
+                    <th key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.footer,
+                            header.getContext()
+                          )}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </tfoot>
+          </table>
+        )}
         <div className="mt-6 flex justify-end items-center gap-6 w-full">
           <div>
             <p className="text-xs">
