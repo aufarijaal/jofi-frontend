@@ -25,7 +25,7 @@ axios.interceptors.response.use(
       //   }
       // }
 
-      if(error) {
+      if(error && typeof window !== 'undefined') {
         switch (error.response?.status) {
           case 403:
             window.location.href = '/forbidden'
