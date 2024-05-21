@@ -12,27 +12,28 @@ import { cn } from '@/lib/utils'
 import { useAuthContext } from '@/context/AuthContext'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  if(!ctx.req.cookies.accessToken) {
-    return {
-      redirect: '/auth/signin',
-      props: {}
-    }
-  }
+  // if(!ctx.req.cookies.accessToken) {
+  //   return {
+  //     redirect: '/auth/signin',
+  //     props: {}
+  //   }
+  // }
 
-  const appliedJobs = await axios.get(`/applications`, {
-    headers: {
-      Authorization: ctx.req.cookies.accessToken,
-    },
-  })
+  // const appliedJobs = await axios.get(`/applications`, {
+  //   headers: {
+  //     Authorization: ctx.req.cookies.accessToken,
+  //   },
+  // })
 
   return {
     props: {
-      appliedJobs: appliedJobs.data.data,
+      // appliedJobs: appliedJobs.data.data,
+      accessToken: ctx.req.cookies.accessToken
     },
   }
 }
 
-export default function Home({ appliedJobs }: any) {
+export default function Home({ accessToken }: any) {
   const router = useRouter()
   const auth = useAuthContext()
 
@@ -58,7 +59,8 @@ export default function Home({ appliedJobs }: any) {
     <HomePageLayout title="JoFi - Applied Jobs">
       {/* Applied jobs list */}
       <div id="applied-job-list-container" className="mt-6">
-        {auth?.user ? <div
+        {accessToken}
+        {/* {auth?.user ? <div
           id="applied-job-list"
           className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4"
         >
@@ -85,7 +87,7 @@ export default function Home({ appliedJobs }: any) {
           ) : (
             <div className="text-sm">You are not applied to any jobs</div>
           )}
-        </div> : <div>Please sign in to see your applied jobs. <Link className="hover:underline" href="/auth/signin">Sign in</Link></div>}
+        </div> : <div>Please sign in to see your applied jobs. <Link className="hover:underline" href="/auth/signin">Sign in</Link></div>} */}
       </div>
     </HomePageLayout>
   )
