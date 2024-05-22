@@ -161,7 +161,7 @@ export default function Home() {
               <JobCard
                 key={i}
                 jobData={job}
-                onSaveToggle={() => router.replace(router.asPath)}
+                onSaveToggle={() => getJobs()}
               />
             ))}
           </div>
