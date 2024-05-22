@@ -11,6 +11,7 @@ import JobExperienceCard from '@/components/job-experience-card'
 import EducationCard from '@/components/education-card'
 import FormEducation from '@/components/forms/form-education'
 import FormSkills from '@/components/forms/form-skills'
+import { AxiosError } from 'axios'
 
 // export const getServerSideProps: GetServerSideProps = async (ctx) => {
 //   const result = await axios.get(`/account/profile`, {
@@ -37,7 +38,22 @@ const ProfilePage = () => {
   const [editSkills, setEditSkills] = useState(false)
   const [eduLoading, setEduLoading] = useState(false)
   const [expLoading, setExpLoading] = useState(false)
-  const [info, setInfo] = useState<any>()
+  const [info, setInfo] = useState<{
+    profile: {
+      about: string | null;
+    } | null;
+    jobExperiences: {
+      id: number;
+      title: string;
+      companyName: string;
+      startDate: Date;
+      endDate: Date | null;
+      isCurrent: boolean;
+      userId: number;
+    }[];
+    educations: any
+    userSkills: any
+  }>()
 
   function refresh() {
     router.replace(router.asPath)
@@ -76,10 +92,16 @@ const ProfilePage = () => {
   async function getProfile() {
     try {
       const result = await axios.get(`/account/profile`)
-      
+
       setInfo(result.data.data)
     } catch (error) {
       console.error(error)
+
+      if(error instanceof AxiosError) {
+        if(error.status === 401) {
+          window.location.href = '/unauthorized'
+        }
+      }
     }
   }
 
@@ -92,12 +114,12 @@ const ProfilePage = () => {
       <Alert dismissable />
 
       <div className="mt-4">
-        <FormProfileAbout
+        {info && <FormProfileAbout
           onSuccess={() => {
             refresh()
           }}
-          existingAbout={info.profile.about}
-        />
+          existingAbout={info?.profile!.about as string}
+        />}
       </div>
 
       <div className="divider"></div>
@@ -117,7 +139,7 @@ const ProfilePage = () => {
         </div>
 
         <div className="mt-2">
-          <FormSkills existing={info.userSkills} editMode={editSkills} />
+          {info && <FormSkills existing={info.userSkills} editMode={editSkills} />}
         </div>
       </div>
 
@@ -147,7 +169,7 @@ const ProfilePage = () => {
             showFormJobXp ? 'hidden' : 'flex',
           ])}
         >
-          {info.jobExperiences.map((xp: any) => (
+          {info && info.jobExperiences.map((xp: any) => (
             <JobExperienceCard
               data={xp}
               key={xp.id}
@@ -201,7 +223,7 @@ const ProfilePage = () => {
             showFormEdu ? 'hidden' : 'flex',
           ])}
         >
-          {info.educations.map((edu: any) => (
+          {info && info.educations.map((edu: any) => (
             <EducationCard
               data={edu}
               key={edu.id}
