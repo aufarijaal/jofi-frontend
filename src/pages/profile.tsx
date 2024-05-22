@@ -2,7 +2,7 @@ import FormProfileAbout from '@/components/forms/form-profile-about'
 import SettingsPageLayout from '@/components/settings-page-layout'
 import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from '@/lib/axios'
 import useAlert from '@/hooks/useAlert'
 import FormJobExperiences from '@/components/forms/form-job-experiences'
@@ -12,21 +12,21 @@ import EducationCard from '@/components/education-card'
 import FormEducation from '@/components/forms/form-education'
 import FormSkills from '@/components/forms/form-skills'
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const result = await axios.get(`/account/profile`, {
-    headers: {
-      Authorization: ctx.req.cookies.accessToken,
-    },
-  })
+// export const getServerSideProps: GetServerSideProps = async (ctx) => {
+//   const result = await axios.get(`/account/profile`, {
+//     headers: {
+//       Authorization: ctx.req.cookies.accessToken,
+//     },
+//   })
 
-  return {
-    props: {
-      info: result.data.data,
-    },
-  }
-}
+//   return {
+//     props: {
+//       info: result.data.data,
+//     },
+//   }
+// }
 
-const ProfilePage = ({ info }: any) => {
+const ProfilePage = () => {
   const router = useRouter()
   const { setAlert, Alert } = useAlert()
   const [jobXpToEdit, setJobXpToEdit] = useState()
@@ -37,6 +37,7 @@ const ProfilePage = ({ info }: any) => {
   const [editSkills, setEditSkills] = useState(false)
   const [eduLoading, setEduLoading] = useState(false)
   const [expLoading, setExpLoading] = useState(false)
+  const [info, setInfo] = useState<any>()
 
   function refresh() {
     router.replace(router.asPath)
@@ -71,6 +72,20 @@ const ProfilePage = ({ info }: any) => {
       setEduLoading(false)
     }
   }
+
+  async function getProfile() {
+    try {
+      const result = await axios.get(`/account/profile`)
+      
+      setInfo(result.data.data)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    getProfile()
+  }, [])
 
   return (
     <SettingsPageLayout title="Profile | JoFi" headerTitle="Profile">
