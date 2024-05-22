@@ -1,5 +1,5 @@
 import JobCard from '@/components/job-card/job-card'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
@@ -11,31 +11,32 @@ import HomePageLayout from '@/components/home-page-layout'
 import { cn } from '@/lib/utils'
 import { useAuthContext } from '@/context/AuthContext'
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  // if(!ctx.req.cookies.accessToken) {
-  //   return {
-  //     redirect: '/auth/signin',
-  //     props: {}
-  //   }`
-  // }
+// export const getServerSideProps: GetServerSideProps = async (ctx) => {
+//   // if(!ctx.req.cookies.accessToken) {
+//   //   return {
+//   //     redirect: '/auth/signin',
+//   //     props: {}
+//   //   }`
+//   // }
 
-  // const appliedJobs = await axios.get(`/applications`, {
-  //   headers: {
-  //     Authorization: ctx.req.cookies.accessToken,
-  //   },
-  // })
+//   // const appliedJobs = await axios.get(`/applications`, {
+//   //   headers: {
+//   //     Authorization: ctx.req.cookies.accessToken,
+//   //   },
+//   // })
 
-  return {
-    props: {
-      // appliedJobs: appliedJobs.data.data,
-      accessToken: ctx.req.cookies.accessToken
-    },
-  }
-}
+//   return {
+//     props: {
+//       // appliedJobs: appliedJobs.data.data,
+//       accessToken: ctx.req.cookies.accessToken
+//     },
+//   }
+// }
 
-export default function Home({ accessToken }: any) {
+export default function Home() {
   const router = useRouter()
   const auth = useAuthContext()
+  const [appliedJobs, setAppliedJobs] = useState([])
 
   function badgeColor(
     status: 'RECEIVED' | 'INTERVIEW' | 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED'
@@ -55,17 +56,31 @@ export default function Home({ accessToken }: any) {
     }
   }
 
+  async function getAppliedJobs() {
+    try {
+      const result = await axios.get(`/applications`)
+
+      setAppliedJobs(result.data.data)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    getAppliedJobs()
+  }, [])
+
+
   return (
     <HomePageLayout title="JoFi - Applied Jobs">
       {/* Applied jobs list */}
       <div id="applied-job-list-container" className="mt-6">
-        {accessToken}
-        {/* {auth?.user ? <div
+        {auth?.user ? <div
           id="applied-job-list"
           className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4"
         >
-          {appliedJobs.length > 0 ? (
-            appliedJobs.map((appliedJob: any, i: number) => (
+          {appliedJobs?.length > 0 ? (
+            appliedJobs?.map((appliedJob: any, i: number) => (
               <JobCard
                 key={i}
                 jobData={appliedJob.job}
@@ -87,7 +102,7 @@ export default function Home({ accessToken }: any) {
           ) : (
             <div className="text-sm">You are not applied to any jobs</div>
           )}
-        </div> : <div>Please sign in to see your applied jobs. <Link className="hover:underline" href="/auth/signin">Sign in</Link></div>} */}
+        </div> : <div>Please sign in to see your applied jobs. <Link className="hover:underline" href="/auth/signin">Sign in</Link></div>}
       </div>
     </HomePageLayout>
   )
