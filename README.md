@@ -1,40 +1,15 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# JoFi (Job Finder)
 
-## Getting Started
+Web application to find jobs
 
-First, run the development server:
+link: [www.jofi.my.id](http://www.jofi.my.id)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+![ss1](jofi-screenshots/2024-05-22%2019.11.01%20www.jofi.my.id%2021cc15df3a4d.png)
+![ss2](jofi-screenshots/2024-05-22%2019.11.38%20www.jofi.my.id%205be7b941aa70.png)
+![ss3](jofi-screenshots/2024-05-22%2019.12.34%20www.jofi.my.id%202f6f1414ab15.png)
+![ss4](jofi-screenshots/2024-05-22%2019.13.00%20www.jofi.my.id%2062355edc885c.png)
+![ss5](jofi-screenshots/2024-05-22%2019.13.57%20www.jofi.my.id%209189578af118.png)
+![ss6](jofi-screenshots/2024-05-22%2019.14.23%20www.jofi.my.id%203e902798be10.png)
+![ss7](jofi-screenshots/2024-05-22%2019.14.34%20www.jofi.my.id%20472affff7dc2.png)
+![ss8](jofi-screenshots/2024-05-22%2019.14.50%20www.jofi.my.id%20d19928cb7f39.png)
+![ss9](jofi-screenshots/2024-05-22%2019.14.58%20www.jofi.my.id%201a7ba45f6af6.png)
