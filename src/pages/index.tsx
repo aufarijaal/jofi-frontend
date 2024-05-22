@@ -41,7 +41,7 @@ export default function Home() {
   const [jobs, setJobs] = useState([])
   const [jobCategories, setJobCategories] = useState([])
   const [pagination, setPagination] = useState<{ hasNextPage: boolean; hasPreviousPage: boolean }>()
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   function refresh(newParam: Record<string, any>) {
     router.replace({
@@ -115,7 +115,7 @@ export default function Home() {
           </div>
           <div className="toolbar__line-1 flex items-center gap-4">
             <div className="text-xs">Sort by</div>
-            {router.isReady && <select
+            {loading ? <div className="skeleton w-[246px] h-[32px] rounded-none"></div> : router.isReady && <select
               className="select select-bordered select-sm"
               defaultValue={router.query.sortBy ?? 'recentlyPosted'}
               onChange={(e) => refresh({ sortBy: e.target.value })}
@@ -166,7 +166,7 @@ export default function Home() {
             ))}
           </div>
         ) : loading ? <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
-          {Array.from({ length: 10 }, (v, i) => (<div className="skeleton w-[355px] h-[248px]"></div>))}
+          {Array.from({ length: 10 }, (v, i) => (<div className="skeleton w-[355px] h-[248px]" key={i}></div>))}
         </div> : (
           <div className="grid place-items-center w-full text-secondary text-sm h-[100px]">
             {'No result found'}

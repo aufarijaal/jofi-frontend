@@ -13,6 +13,7 @@ import axios from '@/lib/axios'
 function Footer() {
   const auth = useAuthContext()
   const { theme } = useTheme()
+  const [mounted, setMounted] = useState(false)
 
   const feedbackMessageMaxLength = 1_000
   const feedbackModalSlug = 'feedback-modal'
@@ -86,6 +87,10 @@ function Footer() {
 
     return () => subscription.unsubscribe()
   }, [form.watch])
+
+  useEffect(() => {
+    setMounted(true)
+  })
 
   return (
     <footer className="footer footer-center p-10 bg-base-200 text-base-content rounded">
@@ -185,15 +190,18 @@ function Footer() {
       <nav>
         <div className="grid grid-flow-col gap-4">
           <Link href="/" className="font-extrabold">
-            <img
-              className="h-[42px]"
-              src={
-                theme === 'corporate'
-                  ? '/favicon-light.svg'
-                  : '/favicon-dark.svg'
-              }
-              alt="jofi logo"
-            />{' '}
+            {mounted
+              &&
+              <img
+                className="h-[42px]"
+                src={
+                  theme === 'corporate'
+                    ? '/favicon-light.svg'
+                    : '/favicon-dark.svg'
+                }
+                alt="jofi logo"
+              />
+            }
           </Link>
         </div>
       </nav>

@@ -32,7 +32,7 @@ axios.interceptors.response.use(
             window.location.href = '/forbidden'
             break;
           case 401:
-            if(error.config?.url !== '/account/me') window.location.href = '/unauthorized'
+            if(error.config?.url !== '/account/me' && error.config?.url !== '/applications' && error.config?.url !== '/saved-jobs') window.location.href = '/unauthorized'
             break;
           case 404: 
             window.location.href = '/404'
