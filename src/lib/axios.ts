@@ -5,6 +5,7 @@ const baseURL = process.env.NEXT_PUBLIC_SERVER_HOST
 axios.defaults.withCredentials = true
 axios.defaults.baseURL = baseURL
 axios.defaults.timeout = 10_000
+axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
 
 axios.interceptors.response.use(
   (response) => {

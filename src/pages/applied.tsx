@@ -16,7 +16,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   //   return {
   //     redirect: '/auth/signin',
   //     props: {}
-  //   }
+  //   }`
   // }
 
   // const appliedJobs = await axios.get(`/applications`, {
