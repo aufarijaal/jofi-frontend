@@ -1,5 +1,5 @@
 import JobCard from '@/components/job-card/job-card'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
@@ -9,35 +9,39 @@ import { useRouter } from 'next/router'
 import { JsonView } from 'react-json-view-lite'
 import HomePageLayout from '@/components/home-page-layout'
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const jobs = await axios.get(`/jobs`, {
-    params: {
-      dataPerPage: ctx.query.dataPerPage ?? 10,
-      page: ctx.query.page ?? 1,
-      q: ctx.query.q ?? '',
-      sortBy: ctx.query.sortBy ?? 'recentlyPosted',
-      category: ctx.query.category ?? 'all',
-    },
-    headers: {
-      Authorization: ctx.req.cookies.accessToken,
-    },
-  })
-  const jobCategoriesFetch = await axios.get('/job-categories')
+// export const getServerSideProps: GetServerSideProps = async (ctx) => {
+//   const jobs = await axios.get(`/jobs`, {
+//     params: {
+//       dataPerPage: ctx.query.dataPerPage ?? 10,
+//       page: ctx.query.page ?? 1,
+//       q: ctx.query.q ?? '',
+//       sortBy: ctx.query.sortBy ?? 'recentlyPosted',
+//       category: ctx.query.category ?? 'all',
+//     },
+//     headers: {
+//       Authorization: ctx.req.cookies.accessToken,
+//     },
+//   })
+//   const jobCategoriesFetch = await axios.get('/job-categories')
 
-  return {
-    props: {
-      jobs: jobs.data.data.jobPosts,
-      pagination: jobs.data.data.pagination,
-      jobCategoriesProps: jobCategoriesFetch.data.data,
-    },
-  }
-}
+//   return {
+//     props: {
+//       jobs: jobs.data.data.jobPosts,
+//       pagination: jobs.data.data.pagination,
+//       jobCategoriesProps: jobCategoriesFetch.data.data,
+//     },
+//   }
+// }
 
-export default function Home({ jobs, jobCategoriesProps, pagination }: any) {
+export default function Home() {
   const router = useRouter()
   const [searchValue, setSearchValue] = useState(
     (router.query.q as string) ?? ''
   )
+  const [jobs, setJobs] = useState([])
+  const [jobCategories, setJobCategories] = useState([])
+  const [pagination, setPagination] = useState<{ hasNextPage: boolean; hasPreviousPage: boolean }>()
+  const [loading, setLoading] = useState(false)
 
   function refresh(newParam: Record<string, any>) {
     router.replace({
@@ -48,6 +52,40 @@ export default function Home({ jobs, jobCategoriesProps, pagination }: any) {
       },
     })
   }
+
+  async function getJobs() {
+    try {
+      setLoading(true)
+
+      const jobs = await axios.get(`/jobs`, {
+        params: {
+          dataPerPage: router.query.dataPerPage ?? 10,
+          page: router.query.page ?? 1,
+          q: router.query.q ?? '',
+          sortBy: router.query.sortBy ?? 'recentlyPosted',
+          category: router.query.category ?? 'all',
+        }
+      })
+
+      const jobCategoriesFetch = await axios.get('/job-categories')
+
+      setJobs(jobs.data.data.jobPosts)
+      setPagination(jobs.data.data.pagination)
+      setJobCategories(jobCategoriesFetch.data.data)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (router.isReady) {
+      getJobs()
+      console.log('triggered')
+      console.log(router.query)
+    }
+  }, [router.query.category, router.query.sortBy, router.query.q])
 
   return (
     <HomePageLayout title="JoFi">
@@ -77,7 +115,7 @@ export default function Home({ jobs, jobCategoriesProps, pagination }: any) {
           </div>
           <div className="toolbar__line-1 flex items-center gap-4">
             <div className="text-xs">Sort by</div>
-            <select
+            {router.isReady && <select
               className="select select-bordered select-sm"
               defaultValue={router.query.sortBy ?? 'recentlyPosted'}
               onChange={(e) => refresh({ sortBy: e.target.value })}
@@ -85,11 +123,11 @@ export default function Home({ jobs, jobCategoriesProps, pagination }: any) {
               <option value="mostRelevant">Most Relevant</option>
               <option value="highestSalary">Highest Salary</option>
               <option value="recentlyPosted">Recently Posted</option>
-            </select>
+            </select>}
 
             <div className="flex items-center gap-2">
               <div className="text-xs">Category</div>
-              <select
+              {loading ? <div className="skeleton w-[246px] h-[32px] rounded-none"></div> : router.isReady && jobCategories && <select
                 className="select select-sm select-bordered w-full"
                 defaultValue={router.query.category ?? 'all'}
                 onChange={(e) => {
@@ -97,7 +135,7 @@ export default function Home({ jobs, jobCategoriesProps, pagination }: any) {
                 }}
               >
                 <option value={'all'}>All</option>
-                {jobCategoriesProps?.map((category: any) => (
+                {jobCategories?.map((category: any) => (
                   <option
                     value={category.slug}
                     title={category.slug}
@@ -106,7 +144,7 @@ export default function Home({ jobs, jobCategoriesProps, pagination }: any) {
                     {category.name}
                   </option>
                 ))}
-              </select>
+              </select>}
             </div>
           </div>
         </div>
@@ -114,7 +152,7 @@ export default function Home({ jobs, jobCategoriesProps, pagination }: any) {
 
       {/* Job post list */}
       <div id="job-list-container" className="mt-6">
-        {jobs.length > 0 ? (
+        {!loading && jobs.length > 0 ? (
           <div
             id="job-list"
             className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4"
@@ -127,20 +165,22 @@ export default function Home({ jobs, jobCategoriesProps, pagination }: any) {
               />
             ))}
           </div>
-        ) : (
+        ) : loading ? <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+          {Array.from({ length: 10 }, (v, i) => (<div className="skeleton w-[355px] h-[248px]"></div>))}
+        </div> : (
           <div className="grid place-items-center w-full text-secondary text-sm h-[100px]">
-            {'No result for ' + router.query.q}
+            {'No result found'}
           </div>
         )}
 
         <div className="w-full mt-6 flex justify-end gap-2">
-          <button
+          {pagination && <button
             className="btn btn-sm btn-accent"
             onClick={() =>
               refresh({
                 page:
                   router.query.page ||
-                  !isNaN(parseInt(router.query.page as string))
+                    !isNaN(parseInt(router.query.page as string))
                     ? parseInt(router.query.page as string) - 1
                     : 1,
               })
@@ -148,14 +188,14 @@ export default function Home({ jobs, jobCategoriesProps, pagination }: any) {
             disabled={!pagination.hasPreviousPage}
           >
             Previous
-          </button>
-          <button
+          </button>}
+          {pagination && <button
             className="btn btn-sm btn-accent"
             onClick={() =>
               refresh({
                 page:
                   router.query.page ||
-                  !isNaN(parseInt(router.query.page as string))
+                    !isNaN(parseInt(router.query.page as string))
                     ? parseInt(router.query.page as string) + 1
                     : 2,
               })
@@ -163,7 +203,7 @@ export default function Home({ jobs, jobCategoriesProps, pagination }: any) {
             disabled={!pagination.hasNextPage}
           >
             Next
-          </button>
+          </button>}
         </div>
       </div>
     </HomePageLayout>
