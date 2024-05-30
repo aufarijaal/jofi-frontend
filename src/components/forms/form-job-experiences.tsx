@@ -70,9 +70,15 @@ const FormJobExperiences: React.FC<{
         },
       })
 
-      onSuccess?.()
-      form.reset()
-      toast.success(existing?.id ? "Job experience updated" : "New job experience added")
+      toast.success(
+        existing?.id ? 'Job experience updated' : 'New job experience added',
+        {
+          onAutoClose: (t) => {
+            form.reset()
+            onSuccess?.()
+          },
+        }
+      )
     } catch (error) {
       if (error instanceof AxiosError) {
         form.setError('root', {

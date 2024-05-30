@@ -29,13 +29,14 @@ function MyApp({ Component, pageProps }: AppProps) {
       </Head>
       <AuthContextProvider>
         <ModalProvider>
-          <ModalContainer className="bg-black/10 grid place-items-center"/>
+          <ModalContainer className="bg-black/10 grid place-items-center" />
           <Toaster
+            duration={1500}
             toastOptions={{
               unstyled: true,
               classNames: {
                 toast:
-                  'w-full p-4 shadow-lg shadow-base-300 flex font-sans items-center gap-4',
+                  'w-full p-4 shadow-lg shadow-base-300 flex font-sans items-center gap-4 duration-100',
                 content: 'text-sm w-full',
                 success: 'bg-success text-success-content',
                 info: 'bg-info text-info-content',

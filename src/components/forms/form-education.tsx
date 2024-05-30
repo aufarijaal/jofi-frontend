@@ -76,9 +76,14 @@ const FormEducation: React.FC<{
         },
       })
 
-      onSuccess?.()
-      form.reset()
-      toast.success(existing?.id ? "Educations updated" : "New education item added")
+      toast.success(
+        existing?.id ? 'Educations updated' : 'New education item added',
+        {
+          onAutoClose: (t) => {
+            window.location.reload()
+          },
+        }
+      )
     } catch (error) {
       console.error(error)
 

@@ -43,7 +43,7 @@ const FormSkills: React.FC<{
     } catch (error) {
       console.error(error)
 
-      toast.error("Failed to add new skill")
+      toast.error('Failed to add new skill')
     } finally {
       setIsLoading(false)
     }
@@ -59,13 +59,12 @@ const FormSkills: React.FC<{
       setValue('')
       setSkillSearchResult([])
 
-      toast.success("Skill removed")
+      toast.success('Skill removed')
     } catch (error) {
       console.error(error)
+      toast.error('Failed to remove skill')
     } finally {
       setIsLoading(false)
-
-      toast.error('Failed to remove skill')
     }
   }
 
@@ -101,11 +100,8 @@ const FormSkills: React.FC<{
       {/* <JsonView data={userSkills} /> */}
       <div className="flex gap-2 flex-wrap max-w-md">
         {userSkills.map((userSkill, i: number) => (
-          <div className="flex items-center">
-            <div
-              className="badge badge-secondary badge-outline badge-lg text-sm"
-              key={i}
-            >
+          <div className="flex items-center" key={i}>
+            <div className="badge badge-secondary badge-outline badge-lg text-sm">
               {userSkill.skill.name}
             </div>
             {editMode ? (

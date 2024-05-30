@@ -48,7 +48,11 @@ const JobCard: React.FC<{
               className="text-warning"
             />
 
-            <span>{convertRupiah(jobData.salary, { floatingPoint: 0 })}</span>
+            <span>
+              {jobData.salary < 1
+                ? 'Confidential'
+                : convertRupiah(jobData.salary, { floatingPoint: 0 })}
+            </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
             <Icon
