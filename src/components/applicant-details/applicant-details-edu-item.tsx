@@ -21,7 +21,7 @@ const ApplicantDetailsEduItem: React.FC<{ info: Education }> = ({ info }) => (
       </div>
       <div className="edu-item__time--end-date text-xs">
         <span className="font-semibold">End: </span>
-        {dayjs(info.startDate).format('MMMM YYYY') ?? '-'}
+        {dayjs(info.endDate).format('MMMM YYYY') ?? '-'}
       </div>
     </div>
   </div>
