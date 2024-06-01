@@ -196,7 +196,7 @@ const JobDetailPage = () => {
               <div className="text-sm font-semibold flex items-center gap-2">
                 {/* <Icon icon="mdi:cash" width="20" height="20" /> */}
                 <span className="text-[16px]">💵</span>
-                {job?.detail.salary ?? 0 < 1
+                {parseFloat(job?.detail.salary as string) < 1
                   ? 'Confidential'
                   : convertRupiah((job?.detail.salary ?? 0) as number, {
                       floatingPoint: 0,
