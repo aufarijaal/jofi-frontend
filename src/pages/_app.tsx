@@ -11,7 +11,6 @@ import NextTopLoader from 'nextjs-toploader'
 import { Toaster } from 'sonner'
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs'
 import { ModalContainer, ModalProvider } from '@faceless-ui/modal'
-import 'trix/dist/trix.css'
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()

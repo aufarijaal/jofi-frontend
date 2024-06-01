@@ -7,13 +7,6 @@ import { z } from 'zod'
 import { JobCategory } from '@/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AxiosError } from 'axios'
-import dynamic from 'next/dynamic'
-const TrixEditor = dynamic(
-  () => import('@/components/trix-editor/TrixEditor'),
-  {
-    ssr: false,
-  }
-)
 
 const FormAddJobPost: React.FC<{
   onSuccess?: (data: any) => void
@@ -148,17 +141,11 @@ const FormAddJobPost: React.FC<{
         <div className="label">
           <div className="label-text">Description</div>
         </div>
-        {/* <textarea
+        <textarea
           className="textarea textarea-sm textarea-bordered"
           placeholder="Type here"
           {...form.register('description', { required: true })}
-        ></textarea> */}
-        <TrixEditor
-          onChange={(html: any, content: any) =>
-            form.setValue('description', html)
-          }
-          value={form.getValues('description') ?? ''}
-        />
+        ></textarea>
         {form.formState.errors.description && (
           <div className="label">
             <span className="label-text-alt text-error">
@@ -219,10 +206,10 @@ const FormAddJobPost: React.FC<{
         </label>
       </div>
 
-      {/* <div className="divider my-0"></div> */}
+      <div className="divider my-0"></div>
 
       {/* Job requirements */}
-      {/* <div id="input-requirements">
+      <div id="input-requirements">
         <div className="mb-4 space-y-2">
           <div className="font-bold">Requirements</div>
         </div>
@@ -284,7 +271,7 @@ const FormAddJobPost: React.FC<{
             Add more requirement
           </button>
         </div>
-      </div> */}
+      </div>
     </form>
   )
 }
