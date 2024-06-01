@@ -10,7 +10,7 @@ function Navbar() {
   const router = useRouter()
   const isActive = (href: string) => router.pathname === href
   const auth = useAuthContext()
-  const {theme} = useTheme()
+  const { theme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -18,11 +18,24 @@ function Navbar() {
   })
 
   return (
-    <nav className="navbar fixed top-0 left-0 bg-base-100 shadow-lg z-10">
+    <nav
+      id="user-navbar"
+      className="navbar fixed top-0 left-0 bg-base-100 shadow-lg z-10"
+    >
       <div className="max-w-7xl mx-auto w-full">
         <div className="flex-1 flex items-center">
           <Link href="/" className="block px-4">
-            {mounted && <img className="h-[30px]" src={theme === 'corporate' ? "/favicon-light.svg" : "/favicon-dark.svg"} alt="jofi logo" />}
+            {mounted && (
+              <img
+                className="h-[30px]"
+                src={
+                  theme === 'corporate'
+                    ? '/favicon-light.svg'
+                    : '/favicon-dark.svg'
+                }
+                alt="jofi logo"
+              />
+            )}
           </Link>
           <ul className="menu menu-horizontal px-1">
             {['/employer'].every(

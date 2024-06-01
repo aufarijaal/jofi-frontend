@@ -20,7 +20,7 @@ function AdminDashboard() {
       })
       .finally(() => {
         setLoading(false)
-        console.log('You do not have access to the route')
+        // console.log('You do not have access to the route')
       })
   }
 

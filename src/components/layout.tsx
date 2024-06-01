@@ -48,15 +48,26 @@ function Layout({ children }: { children: React.ReactNode }) {
     ...routesToIncludeEmployerNavbar,
   ]
 
+  const shouldShowAdminNavbar = routesToIncludeAdminNavbar.some((route) =>
+    pathname?.startsWith(route)
+  )
+  const shouldShowEmployerNavbar = routesToIncludeEmployerNavbar.some((route) =>
+    pathname?.startsWith(route)
+  )
+  const shouldShowNavbar = !routesToExcludeNavbar.some((route) =>
+    pathname?.startsWith(route)
+  )
+  const shouldShowFooter = !routesToExcludeFooter.some((route) =>
+    pathname?.startsWith(route)
+  )
+
   return (
     <div id="root-layout">
-      {routesToExcludeNavbar.includes(pathname) ? null : <Navbar />}
-      {!routesToIncludeAdminNavbar.includes(pathname) ? null : <AdminNavbar />}
-      {!routesToIncludeEmployerNavbar.includes(pathname) ? null : (
-        <EmployerNavbar />
-      )}
+      {shouldShowNavbar && <Navbar />}
+      {shouldShowAdminNavbar && <AdminNavbar />}
+      {shouldShowEmployerNavbar && <EmployerNavbar />}
       {children}
-      {routesToExcludeFooter.includes(pathname) ? null : <Footer />}
+      {shouldShowFooter && <Footer />}
     </div>
   )
 }

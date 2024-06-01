@@ -7,6 +7,13 @@ import { z } from 'zod'
 import { JobCategory } from '@/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AxiosError } from 'axios'
+import dynamic from 'next/dynamic'
+const TrixEditor = dynamic(
+  () => import('@/components/trix-editor/TrixEditor'),
+  {
+    ssr: false,
+  }
+)
 
 const FormAddJobPost: React.FC<{
   onSuccess?: (data: any) => void
@@ -29,14 +36,13 @@ const FormAddJobPost: React.FC<{
           }),
       })
     ),
-    salary: z
-      .number({
-        errorMap: (issue, ctx) => ({
-          message: 'Salary must be type of number',
-        }),
-      })
-      .gt(0, { message: 'Salary cannot be zero' }),
+    salary: z.number({
+      errorMap: (issue, ctx) => ({
+        message: 'Salary must be type of number',
+      }),
+    }),
     location: z.string().trim(),
+    active: z.boolean(),
   })
 
   const form = useForm<z.infer<typeof schema>>({
@@ -44,6 +50,7 @@ const FormAddJobPost: React.FC<{
     defaultValues: {
       requirements: [{ requirement: 'Communication skill' }],
       salary: 0,
+      active: true,
     },
   })
 
@@ -137,15 +144,21 @@ const FormAddJobPost: React.FC<{
       </label>
 
       {/* Description */}
-      <label className="form-control w-full">
+      <div className="form-control w-full">
         <div className="label">
           <div className="label-text">Description</div>
         </div>
-        <textarea
+        {/* <textarea
           className="textarea textarea-sm textarea-bordered"
           placeholder="Type here"
           {...form.register('description', { required: true })}
-        ></textarea>
+        ></textarea> */}
+        <TrixEditor
+          onChange={(html: any, content: any) =>
+            form.setValue('description', html)
+          }
+          value={form.getValues('description') ?? ''}
+        />
         {form.formState.errors.description && (
           <div className="label">
             <span className="label-text-alt text-error">
@@ -153,7 +166,7 @@ const FormAddJobPost: React.FC<{
             </span>
           </div>
         )}
-      </label>
+      </div>
 
       {/* Salary */}
       <label className="form-control w-full">
@@ -195,10 +208,21 @@ const FormAddJobPost: React.FC<{
         )}
       </label>
 
-      <div className="divider my-0"></div>
+      <div className="form-control mt-2">
+        <label className="cursor-pointer label">
+          <span className="label-text">Active</span>
+          <input
+            type="checkbox"
+            className="checkbox checkbox-accent"
+            {...form.register('active')}
+          />
+        </label>
+      </div>
+
+      {/* <div className="divider my-0"></div> */}
 
       {/* Job requirements */}
-      <div id="input-requirements">
+      {/* <div id="input-requirements">
         <div className="mb-4 space-y-2">
           <div className="font-bold">Requirements</div>
         </div>
@@ -260,7 +284,7 @@ const FormAddJobPost: React.FC<{
             Add more requirement
           </button>
         </div>
-      </div>
+      </div> */}
     </form>
   )
 }

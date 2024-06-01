@@ -140,6 +140,7 @@ export interface JobPost {
   createdAt: string
   updatedAt?: any
   deletedAt?: any
+  active?: boolean
 }
 
 export interface JobPostForEmployer extends JobPost {

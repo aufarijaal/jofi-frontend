@@ -39,9 +39,11 @@ function EmployerNavbar() {
     setMounted(true)
   })
 
-
   return (
-    <div className="navbar fixed top-0 left-0 bg-base-100 shadow-sm z-10">
+    <div
+      id="employer-navbar"
+      className="navbar fixed top-0 left-0 bg-base-100 shadow-sm z-10"
+    >
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
@@ -67,8 +69,9 @@ function EmployerNavbar() {
             <li>
               <Link
                 href="/employer/dashboard"
-                className={`${router.pathname === '/employer/dashbord' ? 'active' : ''
-                  }`}
+                className={`${
+                  router.pathname === '/employer/dashbord' ? 'active' : ''
+                }`}
               >
                 <Icon
                   icon="mdi:home"
@@ -81,8 +84,9 @@ function EmployerNavbar() {
             </li>
             <li>
               <span
-                className={`menu-dropdown-toggle ${showManagements && 'menu-dropdown-show'
-                  }`}
+                className={`menu-dropdown-toggle ${
+                  showManagements && 'menu-dropdown-show'
+                }`}
                 onClick={() => setshowManagements(!showManagements)}
               >
                 <Icon
@@ -94,15 +98,17 @@ function EmployerNavbar() {
                 <h4>Managements</h4>
               </span>
               <ul
-                className={`menu-dropdown mt-1 ${showManagements && 'menu-dropdown-show'
-                  }`}
+                className={`menu-dropdown mt-1 ${
+                  showManagements && 'menu-dropdown-show'
+                }`}
               >
                 {menu.map((item, i) => (
                   <li key={i}>
                     <Link
                       href={item.url}
-                      className={`${router.pathname === item.url ? 'active' : ''
-                        }`}
+                      className={`${
+                        router.pathname === item.url ? 'active' : ''
+                      }`}
                     >
                       {item.icon}
                       {item.text}
@@ -116,16 +122,17 @@ function EmployerNavbar() {
       </div>
       <div className="navbar-center">
         <Link href="/employer/dashboard" className="btn btn-ghost text-xl">
-          {mounted &&
+          {mounted && (
             <img
               className="h-[30px]"
               src={
-                theme === 'corporate' ? '/favicon-light.svg' : '/favicon-dark.svg'
+                theme === 'corporate'
+                  ? '/favicon-light.svg'
+                  : '/favicon-dark.svg'
               }
               alt="jofi logo"
             />
-          }
-
+          )}
         </Link>
       </div>
       <div className="navbar-end">

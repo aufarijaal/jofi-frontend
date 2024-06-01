@@ -33,19 +33,23 @@ const EmployerJobCard: React.FC<Props> = ({
 
         <div className="my-4 flex flex-col gap-2">
           <div className="flex items-center gap-2 text-xs">
-            <Icon icon="mdi:cash" width="20" height="20" />
+            {/* <Icon icon="mdi:cash" width="20" height="20" /> */}
+            <span className="text-[16px]">💵</span>
             <span>{info.salary}</span>
           </div>
           <div className="flex items-center gap-2 text-xs">
-            <Icon icon="mdi:map-marker-outline" width="20" height="20" />
+            {/* <Icon icon="mdi:map-marker-outline" width="20" height="20" /> */}
+            <span className="text-[16px]">🗺️</span>
             <span>{info.location}</span>
           </div>
           <div className="flex items-center gap-2 text-xs">
-            <Icon icon="mdi:clock-time-five-outline" width="20" height="20" />
+            {/* <Icon icon="mdi:clock-time-five-outline" width="20" height="20" /> */}
+            <span className="text-[16px]">📅</span>
             <span>{info.postedAt}</span>
           </div>
           <div className="flex items-center gap-2 text-xs">
-            <Icon icon="mdi:account-outline" width="20" height="20" />
+            {/* <Icon icon="mdi:account-outline" width="20" height="20" /> */}
+            <span className="text-[16px]">🕵️</span>
             <span>{info.applicantCount} applicants</span>
           </div>
         </div>

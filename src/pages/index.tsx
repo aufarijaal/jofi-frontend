@@ -40,7 +40,10 @@ export default function Home() {
   )
   const [jobs, setJobs] = useState([])
   const [jobCategories, setJobCategories] = useState([])
-  const [pagination, setPagination] = useState<{ hasNextPage: boolean; hasPreviousPage: boolean }>()
+  const [pagination, setPagination] = useState<{
+    hasNextPage: boolean
+    hasPreviousPage: boolean
+  }>()
   const [loading, setLoading] = useState(true)
 
   function refresh(newParam: Record<string, any>) {
@@ -64,7 +67,7 @@ export default function Home() {
           q: router.query.q ?? '',
           sortBy: router.query.sortBy ?? 'recentlyPosted',
           category: router.query.category ?? 'all',
-        }
+        },
       })
 
       const jobCategoriesFetch = await axios.get('/job-categories')
@@ -82,8 +85,8 @@ export default function Home() {
   useEffect(() => {
     if (router.isReady) {
       getJobs()
-      console.log('triggered')
-      console.log(router.query)
+      // console.log('triggered')
+      // console.log(router.query)
     }
   }, [router.query.category, router.query.sortBy, router.query.q])
 
@@ -115,36 +118,49 @@ export default function Home() {
           </div>
           <div className="toolbar__line-1 flex items-center gap-4">
             <div className="text-xs">Sort by</div>
-            {loading ? <div className="skeleton w-[246px] h-[32px] rounded-none"></div> : router.isReady && <select
-              className="select select-bordered select-sm"
-              defaultValue={router.query.sortBy ?? 'recentlyPosted'}
-              onChange={(e) => refresh({ sortBy: e.target.value })}
-            >
-              <option value="mostRelevant">Most Relevant</option>
-              <option value="highestSalary">Highest Salary</option>
-              <option value="recentlyPosted">Recently Posted</option>
-            </select>}
+            {loading ? (
+              <div className="skeleton w-[246px] h-[32px] rounded-none"></div>
+            ) : (
+              router.isReady && (
+                <select
+                  className="select select-bordered select-sm"
+                  defaultValue={router.query.sortBy ?? 'recentlyPosted'}
+                  onChange={(e) => refresh({ sortBy: e.target.value })}
+                >
+                  <option value="mostRelevant">Most Relevant</option>
+                  <option value="highestSalary">Highest Salary</option>
+                  <option value="recentlyPosted">Recently Posted</option>
+                </select>
+              )
+            )}
 
             <div className="flex items-center gap-2">
               <div className="text-xs">Category</div>
-              {loading ? <div className="skeleton w-[246px] h-[32px] rounded-none"></div> : router.isReady && jobCategories && <select
-                className="select select-sm select-bordered w-full"
-                defaultValue={router.query.category ?? 'all'}
-                onChange={(e) => {
-                  refresh({ category: e.target.value })
-                }}
-              >
-                <option value={'all'}>All</option>
-                {jobCategories?.map((category: any) => (
-                  <option
-                    value={category.slug}
-                    title={category.slug}
-                    key={category.id}
+              {loading ? (
+                <div className="skeleton w-[246px] h-[32px] rounded-none"></div>
+              ) : (
+                router.isReady &&
+                jobCategories && (
+                  <select
+                    className="select select-sm select-bordered w-full"
+                    defaultValue={router.query.category ?? 'all'}
+                    onChange={(e) => {
+                      refresh({ category: e.target.value })
+                    }}
                   >
-                    {category.name}
-                  </option>
-                ))}
-              </select>}
+                    <option value={'all'}>All</option>
+                    {jobCategories?.map((category: any) => (
+                      <option
+                        value={category.slug}
+                        title={category.slug}
+                        key={category.id}
+                      >
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                )
+              )}
             </div>
           </div>
         </div>
@@ -158,52 +174,56 @@ export default function Home() {
             className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4"
           >
             {jobs.map((job: any, i: number) => (
-              <JobCard
-                key={i}
-                jobData={job}
-                onSaveToggle={() => getJobs()}
-              />
+              <JobCard key={i} jobData={job} onSaveToggle={() => getJobs()} />
             ))}
           </div>
-        ) : loading ? <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
-          {Array.from({ length: 10 }, (v, i) => (<div className="skeleton w-[355px] h-[248px]" key={i}></div>))}
-        </div> : (
+        ) : loading ? (
+          <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+            {Array.from({ length: 10 }, (v, i) => (
+              <div className="skeleton w-[355px] h-[248px]" key={i}></div>
+            ))}
+          </div>
+        ) : (
           <div className="grid place-items-center w-full text-secondary text-sm h-[100px]">
             {'No result found'}
           </div>
         )}
 
         <div className="w-full mt-6 flex justify-end gap-2">
-          {pagination && <button
-            className="btn btn-sm btn-accent"
-            onClick={() =>
-              refresh({
-                page:
-                  router.query.page ||
+          {pagination && (
+            <button
+              className="btn btn-sm btn-accent"
+              onClick={() =>
+                refresh({
+                  page:
+                    router.query.page ||
                     !isNaN(parseInt(router.query.page as string))
-                    ? parseInt(router.query.page as string) - 1
-                    : 1,
-              })
-            }
-            disabled={!pagination.hasPreviousPage}
-          >
-            Previous
-          </button>}
-          {pagination && <button
-            className="btn btn-sm btn-accent"
-            onClick={() =>
-              refresh({
-                page:
-                  router.query.page ||
+                      ? parseInt(router.query.page as string) - 1
+                      : 1,
+                })
+              }
+              disabled={!pagination.hasPreviousPage}
+            >
+              Previous
+            </button>
+          )}
+          {pagination && (
+            <button
+              className="btn btn-sm btn-accent"
+              onClick={() =>
+                refresh({
+                  page:
+                    router.query.page ||
                     !isNaN(parseInt(router.query.page as string))
-                    ? parseInt(router.query.page as string) + 1
-                    : 2,
-              })
-            }
-            disabled={!pagination.hasNextPage}
-          >
-            Next
-          </button>}
+                      ? parseInt(router.query.page as string) + 1
+                      : 2,
+                })
+              }
+              disabled={!pagination.hasNextPage}
+            >
+              Next
+            </button>
+          )}
         </div>
       </div>
     </HomePageLayout>

@@ -10,8 +10,10 @@ const config = {
     './src/**/*.{ts,tsx}',
   ],
   theme: {
-    fontFamily: {
-      sans: ['Geist', ...defaultTheme.fontFamily.sans],
+    extend: {
+      fontFamily: {
+        sans: ['Geist', ...defaultTheme.fontFamily.sans],
+      },
     },
   },
   plugins: [require('daisyui')],

@@ -39,14 +39,15 @@ const JobCard: React.FC<{
           </div>
         </div>
 
-        <div className="my-4">
+        <div className="my-4 flex flex-col gap-2">
           <div className="flex items-center gap-2 text-sm">
-            <Icon
+            {/* <Icon
               icon="mdi:cash"
               width="20"
               height="20"
               className="text-warning"
-            />
+            /> */}
+            <span className="text-[16px]">💵</span>
 
             <span>
               {jobData.salary < 1
@@ -55,12 +56,13 @@ const JobCard: React.FC<{
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <Icon
+            {/* <Icon
               icon="mdi:map"
               width="20"
               height="20"
               className="text-secondary"
-            />
+            /> */}
+            <span className="text-[16px]">🗺️</span>
             <span>{jobData.location}</span>
           </div>
         </div>

@@ -2,8 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  .job-description-paragraph.trix-content li, trix-editor li {
+    @apply list-disc;
+  }
+
+  trix-editor li {
+    @apply list-inside
+  }
+
+  .trix-button-row button[type='button'].trix-button.trix-button--icon {
+    @apply btn btn-sm btn-circle;
+  }
+}
+
 @layer utilities {
   .skill-search-result__item {
     @apply btn btn-xs;
   }
+}
+
+
+button[type='button'].trix-button.trix-button--icon.trix-button--icon-code[data-trix-attribute='code'],
+span.trix-button-group.trix-button-group--file-tools[data-trix-button-group='file-tools']
+{
+  display: none;
 }

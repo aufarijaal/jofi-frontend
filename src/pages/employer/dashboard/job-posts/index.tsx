@@ -13,9 +13,14 @@ import dayjs from 'dayjs'
 import FormEditJobPost from '@/components/forms/form-edit-job-post'
 import useAlert from '@/hooks/useAlert'
 import { toast } from 'sonner'
+import { Modal, useModal } from '@faceless-ui/modal'
 
 function EmployerDashboardJobPosts() {
-  const AddJobPostDialog = useDialog()
+  const { toggleModal, isModalOpen } = useModal()
+
+  const addJobPostModalSlug = 'add-job-post-modal'
+  const editJobPostModalSlug = 'edit-job-post-modal'
+
   const EditJobPostDialog = useDialog()
   const [jobPostToEdit, setJobPostToEdit] = useState<JobPostForEmployer>()
   const [jobPosts, setJobPosts] = useState<JobPostForEmployer[]>([])
@@ -73,7 +78,7 @@ function EmployerDashboardJobPosts() {
       if (error instanceof AxiosError) {
         console.log(error.response?.data.message)
         toast.error('Failed to delete job post', {
-          description: error.response?.data.message
+          description: error.response?.data.message,
         })
       }
     } finally {
@@ -91,44 +96,80 @@ function EmployerDashboardJobPosts() {
       headerTitle="Job Posts"
     >
       {/* Dialogs */}
-      <AddJobPostDialog.Dialog
-        title="Add new job post"
-        dialogId="dialog-add-job-post"
-        additionalButtons={
-          <button className="btn btn-sm btn-primary" form="form-add-job-post">
-            Submit
-          </button>
-        }
-      >
-        <FormAddJobPost
-          formId="form-add-job-post"
-          onSuccess={(data) => {
-            console.log(`${data.title} job post created.`)
-            page === 1 ? getJobPosts() : setPage(1)
-            AddJobPostDialog.close()
-          }}
-        />
-      </AddJobPostDialog.Dialog>
+      <Modal slug={addJobPostModalSlug} className="modal-box max-w-7xl px-10">
+        <div className="modal-header">
+          <h3 className="font-bold text-lg">Add New Job Post</h3>
+        </div>
 
-      <EditJobPostDialog.Dialog
-        title="Edit job post"
-        dialogId="dialog-edit-job-post"
-        additionalButtons={
-          <button className="btn btn-sm btn-primary" form="form-edit-job-post">
+        {isModalOpen(addJobPostModalSlug) && (
+          <FormAddJobPost
+            formId="form-add-job-post"
+            onSuccess={(data) => {
+              // console.log(`${data.title} job post created.`)
+              page === 1 ? getJobPosts() : setPage(1)
+            }}
+          />
+        )}
+
+        <div className="modal-action">
+          <button
+            type="button"
+            className="btn btn-sm"
+            onClick={() => {
+              toggleModal(addJobPostModalSlug)
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            form="form-add-job-post"
+            type="submit"
+            className="btn btn-sm btn-primary"
+            onClick={() => {
+              toggleModal(addJobPostModalSlug)
+            }}
+          >
             Submit
           </button>
-        }
-      >
-        <FormEditJobPost
-          existingData={jobPostToEdit!}
-          formId="form-edit-job-post"
-          onSuccess={(data) => {
-            console.log(`${data.title} job post updated.`)
-            page === 1 ? getJobPosts() : setPage(1)
-            EditJobPostDialog.close()
-          }}
-        />
-      </EditJobPostDialog.Dialog>
+        </div>
+      </Modal>
+
+      <Modal slug={editJobPostModalSlug} className="modal-box max-w-7xl px-10">
+        <div className="modal-header">
+          <h3 className="font-bold text-lg">Edit Job Post</h3>
+        </div>
+
+        {jobPostToEdit && (
+          <FormEditJobPost
+            existingData={jobPostToEdit!}
+            formId="form-edit-job-post"
+            onSuccess={(data) => {
+              toggleModal(editJobPostModalSlug)
+              page === 1 ? getJobPosts() : setPage(1)
+              setJobPostToEdit(undefined)
+            }}
+          />
+        )}
+        <div className="modal-action">
+          <button
+            type="button"
+            className="btn btn-sm"
+            onClick={() => {
+              toggleModal(editJobPostModalSlug)
+              setJobPostToEdit(undefined)
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            form="form-edit-job-post"
+            className="btn btn-sm btn-primary"
+          >
+            Submit
+          </button>
+        </div>
+      </Modal>
 
       <div>
         {/* <JsonView data={jobPosts} style={defaultStyles} />
@@ -192,7 +233,9 @@ function EmployerDashboardJobPosts() {
 
             <button
               className="btn btn-accent btn-sm"
-              onClick={() => AddJobPostDialog.show()}
+              onClick={() => {
+                toggleModal(addJobPostModalSlug)
+              }}
             >
               <Icon icon="mdi:plus" width="20" height="20" />
               Post a job
@@ -212,13 +255,16 @@ function EmployerDashboardJobPosts() {
                     postedAt: `Posted at ${dayjs(jobPost.createdAt).format(
                       'DD MMM YYYY HH:mm:ss'
                     )}`,
-                    salary: convertRupiah(parseInt(jobPost.salary), {
-                      floatingPoint: 0,
-                    }),
+                    salary:
+                      parseInt(jobPost.salary) < 1
+                        ? 'Confidential'
+                        : convertRupiah(parseInt(jobPost.salary), {
+                            floatingPoint: 0,
+                          }),
                   }}
                   onEditBtnClick={() => {
                     setJobPostToEdit(jobPost)
-                    EditJobPostDialog.show()
+                    toggleModal(editJobPostModalSlug)
                   }}
                   onDeleteBtnClick={(id) => deleteJobPost(id)}
                   key={i}

@@ -34,6 +34,7 @@ interface JobInfo {
   updatedAt?: any
   deletedAt?: any
   company: Company
+  active?: boolean
 }
 interface Detail {
   id: number
@@ -52,6 +53,7 @@ interface Detail {
   company: Company
   saved: boolean
   applied: boolean
+  active?: boolean
 }
 interface Company {
   name: string
@@ -135,7 +137,7 @@ const JobDetailPage = () => {
   useEffect(() => {
     if (router.isReady) {
       getJob()
-      console.log('it runs')
+      // console.log('it runs')
     }
   }, [router])
 
@@ -152,55 +154,84 @@ const JobDetailPage = () => {
       <div id="job-detail-wrapper">
         <header id="job-detail__header" className="flex items-center gap-6">
           <div id="job-detail__company-image">
-            {loading ? <div className="skeleton w-32 h-32 rounded-none"></div> : <img
-              className="w-32"
-              src={generateCompanyLogoUrl(job?.detail.company.logo as string)}
-              alt={`${job?.detail.company.name}'s image`}
-            />}
+            {loading ? (
+              <div className="skeleton w-32 h-32 rounded-none"></div>
+            ) : (
+              <img
+                className="w-32"
+                src={generateCompanyLogoUrl(job?.detail.company.logo as string)}
+                alt={`${job?.detail.company.name}'s image`}
+              />
+            )}
           </div>
 
-          {loading ? <div className="skeleton w-full h-[176px] rounded-none"></div> : <div className="flex flex-col gap-2">
-            <h3 className="text-2xl font-bold">{job?.detail.title}</h3>
-            <Link
-              href={`/companies/${job?.detail.company.slug}`}
-              className="hover:underline"
-            >
-              {job?.detail.company.name}
-            </Link>
-
-            <div className="flex gap-2 items-center text-sm">
-              <Icon icon="mdi:map" width="20" height="20" />
-              {job?.detail.location}
-            </div>
-
-            <div className="flex gap-2 items-center text-sm">
-              <Icon icon="mdi:clock-time-five-outline" width="20" height="20" />
-              Posted at {dayjs(job?.detail.createdAt).format('MMM DD YYYY')}
-            </div>
-
-            <div className="text-sm font-semibold flex items-center gap-2">
-              <Icon icon="mdi:cash" width="20" height="20" />
-              {convertRupiah((job?.detail.salary ?? 0) as number, { floatingPoint: 0 })}
-            </div>
-
-            <div className="mt-4 flex gap-2">
-              <BtnToggleSaveJob
-                jobId={job?.detail.id as number}
-                saved={job?.detail.saved as boolean}
-                withText
-                className="text-sm flex items-center bg-secondary btn btn-sm"
-                iconSize={16}
-                onToggle={() => router.replace(router.asPath)}
-              />
-              <button
-                className="btn btn-primary btn-sm text-base-100"
-                disabled={job?.detail.applied}
-                onClick={() => applyJob()}
+          {loading ? (
+            <div className="skeleton w-full h-[176px] rounded-none"></div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <h3 className="text-2xl font-bold">{job?.detail.title}</h3>
+              <Link
+                href={`/companies/${job?.detail.company.slug}`}
+                className="hover:underline"
               >
-                {job?.detail.applied ? 'Applied' : 'Apply this job'}
-              </button>
+                {job?.detail.company.name}
+              </Link>
+
+              <div className="flex gap-2 items-center text-sm">
+                {/* <Icon icon="mdi:map" width="20" height="20" /> */}
+                <span className="text-[16px]">🗺️</span>
+                {job?.detail.location}
+              </div>
+
+              <div className="flex gap-2 items-center text-sm">
+                {/* <Icon
+                  icon="mdi:clock-time-five-outline"
+                  width="20"
+                  height="20"
+                /> */}
+                <span className="text-[16px]">📅</span>
+                Posted at {dayjs(job?.detail.createdAt).format('MMM DD YYYY')}
+              </div>
+
+              <div className="text-sm font-semibold flex items-center gap-2">
+                {/* <Icon icon="mdi:cash" width="20" height="20" /> */}
+                <span className="text-[16px]">💵</span>
+                {job?.detail.salary ?? 0 < 1
+                  ? 'Confidential'
+                  : convertRupiah((job?.detail.salary ?? 0) as number, {
+                      floatingPoint: 0,
+                    })}
+              </div>
+
+              <div className="mt-4 flex gap-2">
+                <BtnToggleSaveJob
+                  jobId={job?.detail.id as number}
+                  saved={job?.detail.saved as boolean}
+                  withText
+                  className="text-sm flex items-center bg-secondary btn btn-sm"
+                  iconSize={16}
+                  onToggle={() => router.replace(router.asPath)}
+                />
+
+                {job?.detail.active ? (
+                  <button
+                    className="btn btn-primary btn-sm text-base-100"
+                    disabled={job?.detail.applied}
+                    onClick={() => applyJob()}
+                  >
+                    {job?.detail.applied ? 'Applied' : 'Apply this job'}
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-primary btn-sm btn-disabled"
+                    disabled={job?.detail.active}
+                  >
+                    Closed
+                  </button>
+                )}
+              </div>
             </div>
-          </div>}
+          )}
         </header>
 
         <div className="divider"></div>
@@ -211,23 +242,32 @@ const JobDetailPage = () => {
               <h4 className="text-lg font-semibold uppercase">
                 Job description
               </h4>
-              {loading ? <div className="skeleton h-[40px] w-full rounded-none"></div> : <p className="text-sm mt-2 text-justify">
-                {job?.detail.description}
-              </p>}
+              {loading ? (
+                <div className="skeleton h-[40px] w-full rounded-none"></div>
+              ) : (
+                <div
+                  className="mt-2 job-description-paragraph trix-content xl:pr-4"
+                  dangerouslySetInnerHTML={{
+                    __html: job?.detail.description ?? '',
+                  }}
+                ></div>
+              )}
             </div>
 
-            <div id="job-detail__requirements" className="mt-6">
+            {/* <div id="job-detail__requirements" className="mt-6">
               <h4 className="text-lg font-semibold uppercase">Requirements</h4>
               <div className="text-sm mt-2">
                 <ul className="list-disc pl-5">
-                  {!loading ? job?.detail.requirements
-                    .split('~')
-                    .map((r: string, i: number) => (
-                      <li key={i}>{r}</li>
-                    )) : Array.from({length: 5}, (v, i) => (<li className="skeleton h[20px] w-full mt-1"></li>))}
+                  {!loading
+                    ? job?.detail.requirements
+                        .split('~')
+                        .map((r: string, i: number) => <li key={i}>{r}</li>)
+                    : Array.from({ length: 5 }, (v, i) => (
+                        <li className="skeleton h[20px] w-full mt-1"></li>
+                      ))}
                 </ul>
               </div>
-            </div>
+            </div> */}
           </div>
 
           <div className="w-full lg:mt-0 mt-10">
@@ -235,13 +275,16 @@ const JobDetailPage = () => {
               <h4 className="font-semibold">More from this company</h4>
               <div className="flex flex-col gap-2 mt-4">
                 {!loading && job?.moreFromCompany.length ? (
-                  job?.moreFromCompany.map((jobFromCompany: any) => (
+                  job?.moreFromCompany.map((jobFromCompany: any, i) => (
                     <JobCard
+                      key={i}
                       jobData={jobFromCompany}
                       onSaveToggle={() => router.replace(router.asPath)}
                     />
                   ))
-                ) : loading ? <div className="skeleton w-[400px] h-[248px] rounded-none"></div> : (
+                ) : loading ? (
+                  <div className="skeleton w-[400px] h-[248px] rounded-none"></div>
+                ) : (
                   <div className="text-sm text-secondary text-center">
                     No other jobs from this company
                   </div>
@@ -257,13 +300,16 @@ const JobDetailPage = () => {
               </h4>
               <div className="flex flex-col gap-2 mt-4">
                 {!loading && job?.relatedJobs.length ? (
-                  job?.relatedJobs.map((relatedJob: any) => (
+                  job?.relatedJobs.map((relatedJob: any, i) => (
                     <JobCard
+                      key={i}
                       jobData={relatedJob}
                       onSaveToggle={() => router.replace(router.asPath)}
                     />
                   ))
-                ) : loading ? <div className="skeleton w-[400px] h-[248px] rounded-none"></div> : (
+                ) : loading ? (
+                  <div className="skeleton w-[400px] h-[248px] rounded-none"></div>
+                ) : (
                   <div className="text-sm text-secondary text-center">
                     No related jobs
                   </div>

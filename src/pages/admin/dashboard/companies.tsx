@@ -123,7 +123,7 @@ function CompaniesManagementPage() {
     try {
       await company.deleteOne(id)
 
-      console.log('Company deleted successfully')
+      // console.log('Company deleted successfully')
       getCompanies()
     } catch (error: any) {
       console.log(error.message)
@@ -134,7 +134,7 @@ function CompaniesManagementPage() {
     try {
       company.deleteMany(ids)
 
-      console.log('Company deleted successfully')
+      // console.log('Company deleted successfully')
       getCompanies()
     } catch (error: any) {
       console.log(error.message)
