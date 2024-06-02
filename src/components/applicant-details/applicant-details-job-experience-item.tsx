@@ -21,10 +21,12 @@ const ApplicantDetailsJobExperienceItem: React.FC<{ info: JobExperience }> = ({
         <span className="font-semibold">Start: </span>
         {dayjs(info.startDate).format('MMMM YYYY')}
       </div>
-      <div className="job-experience-item__time--end-date text-xs">
-        <span className="font-semibold">End: </span>
-        {dayjs(info.endDate).format('MMMM YYYY') ?? '-'}
-      </div>
+      {info.endDate && (
+        <div className="job-experience-item__time--end-date text-xs">
+          <span className="font-semibold">End: </span>
+          {dayjs(info.endDate).format('MMMM YYYY')}
+        </div>
+      )}
     </div>
   </div>
 )

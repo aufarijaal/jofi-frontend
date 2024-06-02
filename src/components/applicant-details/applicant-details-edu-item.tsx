@@ -19,10 +19,12 @@ const ApplicantDetailsEduItem: React.FC<{ info: Education }> = ({ info }) => (
         <span className="font-semibold">Start: </span>
         {dayjs(info.startDate).format('MMMM YYYY')}
       </div>
-      <div className="edu-item__time--end-date text-xs">
-        <span className="font-semibold">End: </span>
-        {dayjs(info.endDate).format('MMMM YYYY') ?? '-'}
-      </div>
+      {info.endDate && (
+        <div className="edu-item__time--end-date text-xs">
+          <span className="font-semibold">End: </span>
+          {dayjs(info.endDate).format('MMMM YYYY')}
+        </div>
+      )}
     </div>
   </div>
 )
