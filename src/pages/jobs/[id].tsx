@@ -246,7 +246,7 @@ const JobDetailPage = () => {
                 <div className="skeleton h-[40px] w-full rounded-none"></div>
               ) : (
                 <div
-                  className="mt-2 job-description-paragraph trix-content xl:pr-4"
+                  className="mt-2 job-description-paragraph text-sm xl:pr-4"
                   dangerouslySetInnerHTML={{
                     __html: job?.detail.description ?? '',
                   }}
@@ -254,7 +254,7 @@ const JobDetailPage = () => {
               )}
             </div>
 
-            {/* <div id="job-detail__requirements" className="mt-6">
+            <div id="job-detail__requirements" className="mt-6">
               <h4 className="text-lg font-semibold uppercase">Requirements</h4>
               <div className="text-sm mt-2">
                 <ul className="list-disc pl-5">
@@ -267,7 +267,7 @@ const JobDetailPage = () => {
                       ))}
                 </ul>
               </div>
-            </div> */}
+            </div>
           </div>
 
           <div className="w-full lg:mt-0 mt-10">

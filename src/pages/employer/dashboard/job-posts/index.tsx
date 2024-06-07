@@ -125,9 +125,6 @@ function EmployerDashboardJobPosts() {
             form="form-add-job-post"
             type="submit"
             className="btn btn-sm btn-primary"
-            onClick={() => {
-              toggleModal(addJobPostModalSlug)
-            }}
           >
             Submit
           </button>

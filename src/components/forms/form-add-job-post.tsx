@@ -265,6 +265,7 @@ const FormAddJobPost: React.FC<{
           ))}
 
           <button
+            type="button"
             className="btn btn-sm mt-4 w-full"
             onClick={() => requirementsInputArray.append({ requirement: '' })}
           >
